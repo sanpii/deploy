@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
+
+function main()
+{
+    local command=$(echo $SSH_ORIGINAL_COMMAND | grep -Po 'git-[^\s]*')
+    local repo=$(echo $SSH_ORIGINAL_COMMAND | grep -Po "'.*'$" | tr -d "'")
+
+    $command "$REPOSITORIES_DIR/$repo"
+}
+
+main $*
