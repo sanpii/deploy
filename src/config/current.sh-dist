@@ -1,0 +1,10 @@
+readonly GITHUB_USER=""
+readonly GITHUB_TOKEN=""
+
+readonly GITLAB_USER=""
+readonly GITLAB_TOKEN=""
+
+readonly REPOSITORIES_DIR="$HOME/repositories"
+readonly PUBLIC_REPOSITORIES_DIR="$HOME/public_repositories"
+readonly WEBROOT="$HOME/public_html"
+readonly GIT_DOMAIN="localhost"

@@ -1,0 +1,94 @@
+#!/bin/bash
+
+source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
+
+function createRepo()
+{
+    local name=$1
+    local visibility=$2
+    local repo="$REPOSITORIES_DIR/$name.git"
+
+    git init -q --bare "$repo"
+    cd $repo
+    if [[ $visibility = "public" ]]
+    then
+        git config custom.public true
+    fi
+
+    echo $repo
+}
+
+function createGithubMirror()
+{
+    local repo=$1
+    local name=$2
+
+    cd $repo
+    echo -n 'Create github mirror: '
+    curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" https://api.github.com/user/repos -d '{"name":"'$name'"}' > /dev/null
+    if [[ $? -eq 0 ]]
+    then
+        git remote add github git@github.com:$GITHUB_USER/$name.git
+        echo 'ok'
+    else
+        echo 'failed'
+    fi
+}
+
+function createGitlabMirror()
+{
+    local repo=$1
+    local name=$2
+    local visibility=$3
+    local visibility_level=0
+
+    cd $repo
+    if [[ $visibility = "public" ]]
+    then
+        visibility_level=20
+    fi
+
+    echo -n "Create $visibility gitlab mirror: "
+    curl -s --header "PRIVATE-TOKEN: $GITLAB_TOKEN" -d "name=$name" -d "visibility_level=$visibility_level" https://gitlab.com/api/v3/projects > /dev/null
+    if [[ $? -eq 0 ]]
+    then
+        git remote add gitlab git@gitlab.com:$GITLAB_USER/$name.git
+        echo 'ok'
+    else
+        echo 'failed'
+    fi
+}
+
+function installHooks()
+{
+    local repo=$1
+
+    cd "$repo/hooks"
+    ln -s "$(dirname $0)/post-receive"
+}
+
+function main()
+{
+    local name=$1
+    local visibility=${2-private}
+    local repo=$(createRepo $name $visibility)
+
+    if [[ $visibility = "public" ]]
+    then
+        createGithubMirror $repo $name $visibility
+    fi
+
+    createGitlabMirror $repo $name $visibility
+
+    installHooks $repo
+
+    echo git@$GIT_DOMAIN:$name.git
+}
+
+if [[ $# -lt 1 ]]
+then
+    echo $0 name [visibility]
+    exit 1
+fi
+
+main $*
