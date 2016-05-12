@@ -42,11 +42,8 @@ function installVendors()
             echo "Install vendors"
             php $COMPOSER install -n --no-dev
         else
-            DIFF=$(git diff --shortstat $PREV_COMMIT..$POST_COMMIT -- composer.json)
-            if [[ $DIFF != "" ]]; then
-                echo "Update vendors"
-                php $COMPOSER update -n --no-dev
-            fi
+            echo "Update vendors"
+            php $COMPOSER update -n --no-dev
         fi
     fi
 }
