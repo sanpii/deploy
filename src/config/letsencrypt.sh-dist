@@ -1,0 +1,4 @@
+#!/bin/bash
+
+readonly LETSENCRYPT_ROOT="/home/sanpi/.local/share/letsencrypt"
+readonly LETSENCRYPT_WEBROOT="/tmp/letsencrypt/public_html"
