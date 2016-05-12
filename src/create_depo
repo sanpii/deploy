@@ -64,7 +64,7 @@ function installHooks()
     local repo=$1
 
     cd "$repo/hooks"
-    ln -s "$(dirname $0)/post-receive"
+    ln -s "$(dirname $0)/hooks/post-receive"
 }
 
 function main()
