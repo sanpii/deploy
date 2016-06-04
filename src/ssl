@@ -95,11 +95,6 @@ main()
         local sites=$(find /etc/nginx/sites-enabled -type l)
     fi
 
-    if [ $dry_run = false ]
-    then
-        virtualenv "$LETSENCRYPT_ROOT"
-    fi
-
     if [ ! -e "$LETSENCRYPT_WEBROOT" ]
     then
         mkdir -p "$LETSENCRYPT_WEBROOT"
@@ -123,7 +118,7 @@ main()
             then
                 if [ $dry_run = false ]
                 then
-                    "$LETSENCRYPT_ROOT/bin/letsencrypt" certonly $vhosts_arg \
+                    letsencrypt certonly $vhosts_arg \
                         --email "$email" -c /etc/letsencrypt/config.cli.ini \
                         --renew-by-default \
                         --server https://acme-v01.api.letsencrypt.org/directory
