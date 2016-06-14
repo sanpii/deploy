@@ -88,6 +88,14 @@ main()
         local dry_run=false
     fi
 
+    if [ "$1" = '--force' ]
+    then
+        local force=true
+        shift
+    else
+        local force=false
+    fi
+
     if [ $# -gt 0 ]
     then
         local sites=$@
@@ -114,7 +122,7 @@ main()
             local vhosts_arg=$(transform_vhost_to_arg "$vhosts")
             local lastchange=$(get_lastchange $vhosts)
 
-            if [ $lastchange -lt 0 -o $lastchange -gt 60 ]
+            if [ $force -o $lastchange -lt 0 -o $lastchange -gt 60 ]
             then
                 if [ $dry_run = false ]
                 then
