@@ -1,0 +1,6 @@
+#!/bin/bash
+
+readonly MYSQL_USER=root
+readonly MYSQL_PASSWORD=1234
+readonly PGSQL_USER=postgres
+readonly REPOSITORY=/media/backup/borg

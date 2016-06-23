@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+source "$(dirname $(realpath $BASH_SOURCE))/config/backup.sh"
+
+readonly MOUNT_POINT=$(dirname $REPOSITORY)
+
+mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
+
+mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
+sudo -u $PGSQL_USER pg_dumpall -f /media/data/pgsql.dump
+
+borg create -v --stats                    \
+    $REPOSITORY::cuddles-`date +%Y-%m-%d` \
+    /media/data/archives                  \
+    /media/data/mails                     \
+    /media/data/mysql                     \
+    /media/data/postgresql                \
+    /media/data/sync.sh                   \
+    /media/data/share/sanpi/files/wiki    \
+    /etc                                  \
+    /media/data/mysql.dump                \
+    /media/data/pgsql.dump
+
+rsync -r --delete --compress $REPOSITORY kimsufi:~
+
+umount $MOUNT_POINT
