@@ -153,7 +153,7 @@ main()
 
     if [ $dry_run = false ]
     then
-        service nginx restart
+        service nginx reload
     fi
 }
 
