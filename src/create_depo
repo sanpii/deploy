@@ -69,7 +69,7 @@ function installHooks()
 
 function main()
 {
-    local name=$1
+    local name=$(basename $1)
     local visibility=${2-private}
     local repo=$(createRepo $name $visibility)
 
