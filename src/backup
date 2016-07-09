@@ -17,7 +17,6 @@ borg create -v --stats                    \
     /media/data/mails                     \
     /media/data/mysql                     \
     /media/data/pg_backup.tar.xz          \
-    /media/data/sync.sh                   \
     /media/data/share/sanpi/files/wiki    \
     /etc                                  \
     /media/data/mysql.dump
