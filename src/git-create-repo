@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
+readonly BASE_DIR="$(dirname $(realpath $BASH_SOURCE))"
+
+source "$BASE_DIR/config/current.sh"
 
 function createRepo()
 {
@@ -64,7 +66,7 @@ function installHooks()
     local repo=$1
 
     cd "$repo/hooks"
-    ln -s "$(dirname $0)/hooks/post-receive"
+    ln -s "$BASE_DIR/hooks/post-receive"
 }
 
 function main()
