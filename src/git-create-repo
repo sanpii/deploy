@@ -25,7 +25,7 @@ function createRepo()
 function createGithubMirror()
 {
     local repo=$1
-    local name=$2
+    local name=${2/\//-}
 
     cd "$repo"
     echo -n 'Create github mirror: '
@@ -42,7 +42,7 @@ function createGithubMirror()
 function createGitlabMirror()
 {
     local repo=$1
-    local name=$2
+    local name=${2/\//-}
     local visibility=$3
     local visibility_level=0
 
