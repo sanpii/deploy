@@ -13,13 +13,7 @@ sudo -u $PGSQL_USER pg_basebackup --pgdata=- --format=tar --write-recovery-conf 
 
 borg create -v --stats                    \
     $REPOSITORY::cuddles-`date +%Y-%m-%d` \
-    /media/data/archives                  \
-    /media/data/mails                     \
-    /media/data/mysql                     \
-    /media/data/pg_backup.tar.xz          \
-    /media/data/share/sanpi/files/wiki    \
-    /etc                                  \
-    /media/data/mysql.dump
+    $BACKUP_FILES
 
 rsync -r --delete --compress $REPOSITORY kimsufi:~
 
