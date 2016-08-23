@@ -10,7 +10,7 @@ function getSourceDirectory()
 function getPublicDirectory()
 {
     src=$(getSourceDirectory)
-    echo $src | sed "s~$REPOSITORIES_DIR~/$PUBLIC_REPOSITORIES_DIR/~" | sed 's~\.git$~~'
+    echo $src | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
 }
 
 function getCloneUrl()
@@ -122,7 +122,8 @@ function ghPages()
     echo "Publish static pages"
 
     src=$(getSourceDirectory)
-    dst=$(getPublicDirectory | sed $s~$PUBLIC_REPOSITORIES_DIR~/$WEBROOT_DIR/~$)
+    dst=$(getPublicDirectory | sed "s~$PUBLIC_REPOSITORIES_DIR~$WEBROOT_DIR~")
+
     if [[ ! -d "$dst" ]]
     then
         git clone -q -b gh-pages "$src" "$dst"
