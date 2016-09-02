@@ -15,6 +15,9 @@ borg create -v --stats                    \
     $REPOSITORY::cuddles-`date +%Y-%m-%d` \
     $BACKUP_FILES
 
-rsync -r --delete --compress $REPOSITORY kimsufi:~
+if $(date +%H) -eq 3
+then
+    rsync -r --delete --compress $REPOSITORY kimsufi:~ &
+fi
 
 umount $MOUNT_POINT
