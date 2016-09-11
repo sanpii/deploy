@@ -4,9 +4,9 @@ set -e
 
 readonly LOCK="/var/lock/vps-sync"
 
-if test ! -f $LOCK
+if [ ! -f "$LOCK" ]
 then
-    touch $LOCK
-    rsync -arz --delete --delete-after --partial-dir=/media/data/torrent/.partial --exclude='.*' kimsufi:~/torrents/ /media/data/torrent
-    rm $LOCK
+    touch "$LOCK"
+    trap 'rm -f "$LOCK"' EXIT
+    rsync -arz  --delete --delete-after kimsufi:~/torrents/ /media/data/torrent
 fi
