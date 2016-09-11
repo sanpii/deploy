@@ -17,7 +17,7 @@ borg create -v --stats                    \
 
 if $(date +%H) -eq 3
 then
-    rsync -r --delete --compress $REPOSITORY kimsufi:~ &
+    rsync --recursive --delete --compress $REPOSITORY kimsufi:~
 fi
 
 umount $MOUNT_POINT
