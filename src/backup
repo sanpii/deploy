@@ -4,20 +4,31 @@ set -e
 
 source "$(dirname $(realpath $BASH_SOURCE))/config/backup.sh"
 
+readonly LOCK="/var/lock/backup"
 readonly MOUNT_POINT=$(dirname $REPOSITORY)
 
-mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
+function main()
+{
+    mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
 
-mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
-sudo -u $PGSQL_USER pg_basebackup --pgdata=- --format=tar --write-recovery-conf --xlog | xz - > /media/data/pg_backup.tar.xz
+    mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
+    sudo -u $PGSQL_USER pg_basebackup --pgdata=- --format=tar --write-recovery-conf --xlog | xz - > /media/data/pg_backup.tar.xz
 
-borg create -v --stats                    \
-    $REPOSITORY::cuddles-`date +%Y-%m-%d` \
-    $BACKUP_FILES
+    borg create -v --stats                    \
+        $REPOSITORY::cuddles-`date +%Y-%m-%d` \
+        $BACKUP_FILES
 
-if $(date +%H) -eq 3
+    if $(date +%H) -eq 3
+    then
+        rsync --recursive --delete --compress $REPOSITORY kimsufi:~
+    fi
+
+    umount $MOUNT_POINT
+}
+
+if [ ! -f "$LOCK" ]
 then
-    rsync --recursive --delete --compress $REPOSITORY kimsufi:~
+    touch "$LOCK"
+    trap 'rm -f "$LOCK"' EXIT
+    main
 fi
-
-umount $MOUNT_POINT
