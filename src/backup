@@ -18,7 +18,7 @@ function main()
         $REPOSITORY::cuddles-`date +%Y-%m-%d` \
         $BACKUP_FILES
 
-    if $(date +%H) -eq 3
+    if [[ $(date +%H) -eq 3 ]]
     then
         rsync --recursive --delete --compress $REPOSITORY kimsufi:~
     fi
@@ -26,7 +26,7 @@ function main()
     umount $MOUNT_POINT
 }
 
-if [ ! -f "$LOCK" ]
+if [[ ! -f "$LOCK" ]]
 then
     touch "$LOCK"
     trap 'rm -f "$LOCK"' EXIT
