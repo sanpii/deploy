@@ -21,11 +21,14 @@ function getCloneUrl()
 
 function pushMirrors()
 {
-    for remote in $(git remote);
-    do
-        echo "Push to $remote"
-        git push -f -q --all $remote > /dev/null
-    done
+    if [[ ! $(getBranch) =~ ^private- ]]
+    then
+        for remote in $(git remote);
+        do
+            echo "Push to $remote"
+            git push -f -q --all $remote > /dev/null
+        done
+    fi
 }
 
 function getProjectName()
