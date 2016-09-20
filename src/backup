@@ -12,7 +12,7 @@ function main()
     mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
 
     mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
-    sudo -u $PGSQL_USER pg_basebackup --pgdata=- --format=tar --write-recovery-conf --xlog | xz - > /media/data/pg_backup.tar.xz
+    sudo -u $PGSQL_USER pg_dumpall -f /media/data/pgsql.dump
 
     borg create -v --stats                        \
         $REPOSITORY::cuddles-$(date +%Y-%m-%d-%H) \
