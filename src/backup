@@ -7,6 +7,22 @@ source "$(dirname $(realpath $BASH_SOURCE))/config/backup.sh"
 readonly LOCK="/var/lock/backup"
 readonly MOUNT_POINT=$(dirname $REPOSITORY)
 
+function postgresql_get_databases()
+{
+    psql -P tuples_only -c 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+}
+
+function postgresql_test()
+{
+    readonly CLUSTER_DIR="/var/lib/postgresql/$PGSQL_VERSION/backup/"
+
+    sudo -u postgres pg_createcluster $PGSQL_VERSION backup --start -d "$CLUSTER_DIR"
+    sudo -u postgres psql -p 5433 --quiet -c '\i /media/data/pgsql.dump'
+
+
+    sudo -u postgres pg_dropcluster --stop 9.5 backup
+}
+
 function main()
 {
     mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
@@ -20,8 +36,13 @@ function main()
 
     if [[ $(date +%H) -eq 3 ]]
     then
-        rsync --recursive --delete --compress $REPOSITORY kimsufi:~
+        rsync --recursive --delete --compress $REPOSITORY kimsufi:~ &
+        readonly RSYNC_PID=$!
     fi
+
+    postgresql_test
+
+    wait $RSYNC_PID
 
     umount $MOUNT_POINT
 }
