@@ -30,9 +30,11 @@ function main()
     mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
     sudo -u $PGSQL_USER pg_dumpall -f /media/data/pgsql.dump
 
-    borg create -v --stats                        \
-        $REPOSITORY::cuddles-$(date +%Y-%m-%d-%H) \
-        $BACKUP_FILES
+    borg create "$REPOSITORY::cuddles-$(date +%Y-%m-%d-%H)" $BACKUP_FILES
+
+    borg prune --verbose --stats --list \
+        --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 \
+        "$REPOSITORY"
 
     if [[ $(date +%H) -eq 3 ]]
     then
