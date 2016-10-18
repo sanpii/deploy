@@ -150,14 +150,19 @@ function purgeCache()
     ssh reverse-proxy 'for f in $(find /var/cache/nginx/ -type f -exec grep -la "^KEY: $url" {} \;); do rm $f; done'
 }
 
+function main()
+{
+    pushMirrors
+    unset GIT_DIR
+
+    if [[ $(getBranch) == "master" ]]; then
+        pushPublic
+    fi
+    if [[ $(getBranch) == "gh-pages" ]]; then
+        ghPages
+    fi
+}
+
 read OLDREV NEWREV REFNAME
 
-pushMirrors
-unset GIT_DIR
-
-if [[ $(getBranch) == "master" ]]; then
-    pushPublic
-fi
-if [[ $(getBranch) == "gh-pages" ]]; then
-    ghPages
-fi
+main $@
