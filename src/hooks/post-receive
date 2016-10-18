@@ -49,15 +49,15 @@ function pushPublic()
         fi
 
         git clone -q "$src" "$dst"
+        linkConfiguration
 
         cd "$dst"
-        linkConfiguration
         installVendors
         installAssets
         clearCache
-        publish
-
         cd - >/dev/null
+
+        publish
     fi
 }
 
@@ -157,7 +157,7 @@ function getProjectName()
 
 function getSourceDirectory()
 {
-    echo $(cd "$(dirname "$0")" && dirname $(pwd))
+    pwd
 }
 
 function getPublicDirectory()
