@@ -51,26 +51,6 @@ function pushPublic()
         git clone -q "$src" "$dst"
 
         cd "$dst"
-
-        for branch in $(git branch -r | grep -v HEAD)
-        do
-            if [[ -z $(git branch | grep "${branch##*/}") ]]
-            then
-                git branch -q --track "${branch##*/}" "$branch"
-            fi
-        done
-        git fetch -q origin
-        git reset -q --hard origin/master
-
-        if [[ -f "$src/description" ]]
-        then
-            cp "$src/description" "$dst/.git"
-        else
-            touch "$dst/.git/description"
-        fi
-
-        echo "$cloneUrl" > "$dst/.git/cloneurl"
-
         linkConfiguration
         installVendors
         installAssets
