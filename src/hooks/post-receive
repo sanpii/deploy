@@ -28,7 +28,7 @@ function pushMirrors()
     then
         for remote in $(git remote)
         do
-            echo "Push to $remote"
+            info "Push to $remote"
             git push --force --quiet --all "$remote" > /dev/null
         done
     fi
@@ -40,7 +40,7 @@ function pushPublic()
 
     if [[ $public == true ]]
     then
-        echo "Publish repository"
+        info 'Publish repository'
 
         local src=$(getSourceDirectory)
         local dst=$(getRealPublicDirectory)
@@ -88,10 +88,10 @@ function installVendors()
 
         if [[ ! -e "vendor" ]]
         then
-            echo "Install vendors"
+            info 'Install vendors'
             php "$COMPOSER" install --no-interaction --no-dev
         else
-            echo "Update vendors"
+            info 'Update vendors'
             php "$COMPOSER" update --no-interaction --no-dev
         fi
     fi
@@ -101,7 +101,7 @@ function installAssets()
 {
     if [[ -f "bower.json" ]]
     then
-        echo "Install assets"
+        info 'Install assets'
         bower install
     fi
 }
@@ -133,7 +133,7 @@ function publish()
 
 function ghPages()
 {
-    echo "Publish static pages"
+    info 'Publish static pages'
 
     local src=$(getSourceDirectory)
     local dst=$(getPublicDirectory | sed "s~$PUBLIC_REPOSITORIES_DIR~$WEBROOT_DIR~")
@@ -152,7 +152,7 @@ function purgeCache()
 {
     local url=$1
 
-    echo 'Purge cache'
+    info 'Purge cache'
     ssh reverse-proxy 'for f in $(find /var/cache/nginx/ -type f -exec grep -la "^KEY: $url" {} \;); do rm $f; done'
 }
 
@@ -190,6 +190,60 @@ function getCloneUrl()
 function getBranch()
 {
     echo $(git rev-parse --symbolic --abbrev-ref $REFNAME 2> /dev/null)
+}
+
+function info()
+{
+    println BLUE "$1"
+}
+
+function success()
+{
+    println GREEN "$1"
+}
+
+function warning()
+{
+    println ORANGE "$1"
+}
+
+function error()
+{
+    println RED "$1"
+}
+
+function println()
+{
+    print "$1" "$2"
+    echo
+}
+
+function print()
+{
+    local NONE=$(tput -Txterm sgr0)
+
+    local color=$1
+    local message=$2
+
+    case "$color" in
+        RED)
+            color=$(tput -Txterm setaf 1)
+        ;;
+        GREEN)
+            color=$(tput -Txterm setaf 2)
+        ;;
+        ORANGE)
+            color=$(tput -Txterm setaf 3)
+        ;;
+        BLUE)
+            color=$(tput -Txterm setaf 4)
+        ;;
+        *)
+            color=$NONE
+        ;;
+    esac
+
+    echo -n "${color}$message${NONE}"
 }
 
 read OLDREV NEWREV REFNAME
