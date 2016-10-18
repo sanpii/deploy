@@ -11,10 +11,13 @@ function main()
     set -e
     unset GIT_DIR
 
-    if [[ "$(getBranch)" == "master" ]]; then
+    if [[ "$(getBranch)" == "master" ]]
+    then
         pushPublic
     fi
-    if [[ "$(getBranch)" == "gh-pages" ]]; then
+
+    if [[ "$(getBranch)" == "gh-pages" ]]
+    then
         ghPages
     fi
 }
@@ -23,7 +26,7 @@ function pushMirrors()
 {
     if [[ ! "$(getBranch)" =~ ^private- ]]
     then
-        for remote in $(git remote);
+        for remote in $(git remote)
         do
             echo "Push to $remote"
             git push -f -q --all "$remote" > /dev/null
@@ -79,10 +82,12 @@ function linkConfiguration()
 
 function installVendors()
 {
-    if [[ -f "composer.json" ]]; then
+    if [[ -f "composer.json" ]]
+    then
         readonly COMPOSER="$HOME/.local/bin/composer.phar"
 
-        if [[ ! -e "vendor" ]]; then
+        if [[ ! -e "vendor" ]]
+        then
             echo "Install vendors"
             php "$COMPOSER" install -n --no-dev
         else
@@ -94,7 +99,8 @@ function installVendors()
 
 function installAssets()
 {
-    if [[ -f "bower.json" ]]; then
+    if [[ -f "bower.json" ]]
+    then
         echo "Install assets"
         bower install
     fi
