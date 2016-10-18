@@ -86,14 +86,8 @@ function installVendors()
     then
         readonly COMPOSER="$HOME/.local/bin/composer.phar"
 
-        if [[ ! -e "vendor" ]]
-        then
-            info 'Install vendors'
-            php "$COMPOSER" install --no-interaction --no-dev
-        else
-            info 'Update vendors'
-            php "$COMPOSER" update --no-interaction --no-dev
-        fi
+        info 'Install vendors'
+        php "$COMPOSER" install --no-interaction --no-dev
     fi
 }
 
