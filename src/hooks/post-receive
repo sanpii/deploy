@@ -71,12 +71,29 @@ function pushPublic()
 
         echo "$cloneUrl" > "$dst/.git/cloneurl"
 
+        linkConfiguration
         installVendors
         installAssets
         clearCache
         publish
 
         cd - >/dev/null
+    fi
+}
+
+function linkConfiguration()
+{
+    local config="/etc/app/$(getProjectName)"
+    local dst=$(getRealPublicDirectory)
+
+    if [[ -d "$config" ]]
+    then
+        for src in $(find "$config" -type f)
+        do
+            local link=$(echo $src | sed "s~$config~$dst~")
+
+            ln -sf $src $link
+        done
     fi
 }
 
