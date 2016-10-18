@@ -7,22 +7,22 @@ function main()
     pushMirrors
     unset GIT_DIR
 
-    if [[ $(getBranch) == "master" ]]; then
+    if [[ "$(getBranch)" == "master" ]]; then
         pushPublic
     fi
-    if [[ $(getBranch) == "gh-pages" ]]; then
+    if [[ "$(getBranch)" == "gh-pages" ]]; then
         ghPages
     fi
 }
 
 function pushMirrors()
 {
-    if [[ ! $(getBranch) =~ ^private- ]]
+    if [[ ! "$(getBranch)" =~ ^private- ]]
     then
         for remote in $(git remote);
         do
             echo "Push to $remote"
-            git push -f -q --all $remote > /dev/null
+            git push -f -q --all "$remote" > /dev/null
         done
     fi
 }
@@ -48,9 +48,9 @@ function pushPublic()
 
         for branch in $(git branch -r | grep -v HEAD)
         do
-            if [[ -z $(git branch | grep ${branch##*/}) ]]
+            if [[ -z $(git branch | grep "${branch##*/}") ]]
             then
-                git branch -q --track ${branch##*/} $branch
+                git branch -q --track "${branch##*/}" "$branch"
             fi
         done
         git fetch -q origin
@@ -80,10 +80,10 @@ function installVendors()
 
         if [[ ! -e "vendor" ]]; then
             echo "Install vendors"
-            php $COMPOSER install -n --no-dev
+            php "$COMPOSER" install -n --no-dev
         else
             echo "Update vendors"
-            php $COMPOSER update -n --no-dev
+            php "$COMPOSER" update -n --no-dev
         fi
     fi
 }
@@ -107,9 +107,9 @@ function clearCache()
 
     if [[ -f "$console" ]]
     then
-        php $console cache:clear --env=prod
-        php $console assets:install --env=prod web --symlink --relative
-        php $console assetic:dump --env=prod
+        php "$console" cache:clear --env=prod
+        php "$console" assets:install --env=prod web --symlink --relative
+        php "$console" assetic:dump --env=prod
     fi
 }
 
@@ -152,14 +152,14 @@ function getPublicDirectory()
 {
     local src=$(getSourceDirectory)
 
-    echo $src | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
+    echo "$src" | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
 }
 
 function getCloneUrl()
 {
     local src=$(getSourceDirectory)
 
-    echo $src | sed "s~$REPOSITORIES_DIR~git://$GIT_DOMAIN~"
+    echo "$src" | sed "s~$REPOSITORIES_DIR~git://$GIT_DOMAIN~"
 }
 
 function getBranch()
