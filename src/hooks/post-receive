@@ -2,21 +2,17 @@
 
 source "$(dirname $(realpath $BASH_SOURCE))/../config/current.sh"
 
-function getSourceDirectory()
+function main()
 {
-    echo $(cd "$(dirname "$0")" && dirname $(pwd))
-}
+    pushMirrors
+    unset GIT_DIR
 
-function getPublicDirectory()
-{
-    src=$(getSourceDirectory)
-    echo $src | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
-}
-
-function getCloneUrl()
-{
-    src=$(getSourceDirectory)
-    echo $src | sed "s~$REPOSITORIES_DIR~git://$GIT_DOMAIN~"
+    if [[ $(getBranch) == "master" ]]; then
+        pushPublic
+    fi
+    if [[ $(getBranch) == "gh-pages" ]]; then
+        ghPages
+    fi
 }
 
 function pushMirrors()
@@ -28,51 +24,6 @@ function pushMirrors()
             echo "Push to $remote"
             git push -f -q --all $remote > /dev/null
         done
-    fi
-}
-
-function getProjectName()
-{
-    echo $(basename $(getPublicDirectory))
-}
-
-function installVendors()
-{
-    if [[ -f "composer.json" ]]; then
-        readonly COMPOSER="$HOME/.local/bin/composer.phar"
-
-        if [[ ! -e "vendor" ]]; then
-            echo "Install vendors"
-            php $COMPOSER install -n --no-dev
-        else
-            echo "Update vendors"
-            php $COMPOSER update -n --no-dev
-        fi
-    fi
-}
-
-function installAssets()
-{
-    if [[ -f "bower.json" ]]; then
-        echo "Install assets"
-        bower install
-    fi
-}
-
-function clearCache()
-{
-    local console="bin/console"
-
-    if [[ ! -f "$console" ]]
-    then
-        console="app/console"
-    fi
-
-    if [[ -f "$console" ]]
-    then
-        php $console cache:clear --env=prod
-        php $console assets:install --env=prod web --symlink --relative
-        php $console assetic:dump --env=prod
     fi
 }
 
@@ -120,6 +71,46 @@ function pushPublic()
     fi
 }
 
+function installVendors()
+{
+    if [[ -f "composer.json" ]]; then
+        readonly COMPOSER="$HOME/.local/bin/composer.phar"
+
+        if [[ ! -e "vendor" ]]; then
+            echo "Install vendors"
+            php $COMPOSER install -n --no-dev
+        else
+            echo "Update vendors"
+            php $COMPOSER update -n --no-dev
+        fi
+    fi
+}
+
+function installAssets()
+{
+    if [[ -f "bower.json" ]]; then
+        echo "Install assets"
+        bower install
+    fi
+}
+
+function clearCache()
+{
+    local console="bin/console"
+
+    if [[ ! -f "$console" ]]
+    then
+        console="app/console"
+    fi
+
+    if [[ -f "$console" ]]
+    then
+        php $console cache:clear --env=prod
+        php $console assets:install --env=prod web --symlink --relative
+        php $console assetic:dump --env=prod
+    fi
+}
+
 function ghPages()
 {
     echo "Publish static pages"
@@ -137,11 +128,6 @@ function ghPages()
     fi
 }
 
-function getBranch()
-{
-    echo $(git rev-parse --symbolic --abbrev-ref $REFNAME 2> /dev/null)
-}
-
 function purgeCache()
 {
     url=$1
@@ -150,17 +136,31 @@ function purgeCache()
     ssh reverse-proxy 'for f in $(find /var/cache/nginx/ -type f -exec grep -la "^KEY: $url" {} \;); do rm $f; done'
 }
 
-function main()
+function getProjectName()
 {
-    pushMirrors
-    unset GIT_DIR
+    echo $(basename $(getPublicDirectory))
+}
 
-    if [[ $(getBranch) == "master" ]]; then
-        pushPublic
-    fi
-    if [[ $(getBranch) == "gh-pages" ]]; then
-        ghPages
-    fi
+function getSourceDirectory()
+{
+    echo $(cd "$(dirname "$0")" && dirname $(pwd))
+}
+
+function getPublicDirectory()
+{
+    src=$(getSourceDirectory)
+    echo $src | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
+}
+
+function getCloneUrl()
+{
+    src=$(getSourceDirectory)
+    echo $src | sed "s~$REPOSITORIES_DIR~git://$GIT_DOMAIN~"
+}
+
+function getBranch()
+{
+    echo $(git rev-parse --symbolic --abbrev-ref $REFNAME 2> /dev/null)
 }
 
 read OLDREV NEWREV REFNAME
