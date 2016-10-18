@@ -29,7 +29,7 @@ function pushMirrors()
         for remote in $(git remote)
         do
             echo "Push to $remote"
-            git push -f -q --all "$remote" > /dev/null
+            git push --force --quiet --all "$remote" > /dev/null
         done
     fi
 }
@@ -48,10 +48,10 @@ function pushPublic()
 
         if [[ ! -d "$(basename $dst)" ]]
         then
-            mkdir -p "$(basename $dst)"
+            mkdir --parents "$(basename $dst)"
         fi
 
-        git clone -q "$src" "$dst"
+        git clone --quiet "$src" "$dst"
         linkConfiguration
 
         cd "$dst"
@@ -75,7 +75,7 @@ function linkConfiguration()
         do
             local link=$(echo $src | sed "s~$config~$dst~")
 
-            ln -sf $src $link
+            ln --symbolic --force $src $link
         done
     fi
 }
@@ -89,10 +89,10 @@ function installVendors()
         if [[ ! -e "vendor" ]]
         then
             echo "Install vendors"
-            php "$COMPOSER" install -n --no-dev
+            php "$COMPOSER" install --no-interaction --no-dev
         else
             echo "Update vendors"
-            php "$COMPOSER" update -n --no-dev
+            php "$COMPOSER" update --no-interaction --no-dev
         fi
     fi
 }
@@ -128,7 +128,7 @@ function publish()
     local src=$(getRealPublicDirectory)
     local dst=$(getPublicDirectory)
 
-    ln -sfT "$src" "$dst"
+    ln --symbolic --force --no-target-directory "$src" "$dst"
 }
 
 function ghPages()
@@ -140,11 +140,11 @@ function ghPages()
 
     if [[ ! -d "$dst" ]]
     then
-        git clone -q -b gh-pages "$src" "$dst"
+        git clone --quiet --branch gh-pages "$src" "$dst"
     else
         cd "$dst"
-        git fetch -q origin
-        git reset -q --hard origin/gh-pages
+        git fetch --quiet origin
+        git reset --quiet --hard origin/gh-pages
     fi
 }
 
