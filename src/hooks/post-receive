@@ -42,23 +42,27 @@ function pushPublic()
     then
         info 'Publish repository'
 
-        local src=$(getSourceDirectory)
         local dst=$(getRealPublicDirectory)
-        local cloneUrl=$(getCloneUrl)
 
-        if [[ ! -d "$(basename $dst)" ]]
+        if [[ ! -d "$dst" ]]
         then
-            mkdir --parents "$(basename $dst)"
+            local src=$(getSourceDirectory)
+            local cloneUrl=$(getCloneUrl)
+
+            if [[ ! -d "$(basename $dst)" ]]
+            then
+                mkdir --parents "$(basename $dst)"
+            fi
+
+            git clone --quiet "$src" "$dst"
+            linkConfiguration
+
+            cd "$dst"
+            installVendors
+            installAssets
+            clearCache
+            cd - >/dev/null
         fi
-
-        git clone --quiet "$src" "$dst"
-        linkConfiguration
-
-        cd "$dst"
-        installVendors
-        installAssets
-        clearCache
-        cd - >/dev/null
 
         publish
     fi
