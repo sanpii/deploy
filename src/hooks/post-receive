@@ -29,14 +29,16 @@ function pushMirrors()
 
 function pushPublic()
 {
-    public=$(git config --get custom.public)
+    local public=$(git config --get custom.public)
+
     if [[ $public == true ]]
     then
         echo "Publish repository"
 
-        src=$(getSourceDirectory)
-        dst=$(getPublicDirectory)
-        cloneUrl=$(getCloneUrl)
+        local src=$(getSourceDirectory)
+        local dst=$(getPublicDirectory)
+        local cloneUrl=$(getCloneUrl)
+
         if [[ ! -d "$dst" ]]
         then
             git clone -q "$src" "$dst"
@@ -115,8 +117,8 @@ function ghPages()
 {
     echo "Publish static pages"
 
-    src=$(getSourceDirectory)
-    dst=$(getPublicDirectory | sed "s~$PUBLIC_REPOSITORIES_DIR~$WEBROOT_DIR~")
+    local src=$(getSourceDirectory)
+    local dst=$(getPublicDirectory | sed "s~$PUBLIC_REPOSITORIES_DIR~$WEBROOT_DIR~")
 
     if [[ ! -d "$dst" ]]
     then
@@ -130,7 +132,7 @@ function ghPages()
 
 function purgeCache()
 {
-    url=$1
+    local url=$1
 
     echo 'Purge cache'
     ssh reverse-proxy 'for f in $(find /var/cache/nginx/ -type f -exec grep -la "^KEY: $url" {} \;); do rm $f; done'
@@ -148,13 +150,15 @@ function getSourceDirectory()
 
 function getPublicDirectory()
 {
-    src=$(getSourceDirectory)
+    local src=$(getSourceDirectory)
+
     echo $src | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
 }
 
 function getCloneUrl()
 {
-    src=$(getSourceDirectory)
+    local src=$(getSourceDirectory)
+
     echo $src | sed "s~$REPOSITORIES_DIR~git://$GIT_DOMAIN~"
 }
 
