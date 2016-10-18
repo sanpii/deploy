@@ -40,13 +40,15 @@ function pushPublic()
         echo "Publish repository"
 
         local src=$(getSourceDirectory)
-        local dst=$(getPublicDirectory)
+        local dst=$(getRealPublicDirectory)
         local cloneUrl=$(getCloneUrl)
 
-        if [[ ! -d "$dst" ]]
+        if [[ ! -d "$(basename $dst)" ]]
         then
-            git clone -q "$src" "$dst"
+            mkdir -p "$(basename $dst)"
         fi
+
+        git clone -q "$src" "$dst"
 
         cd "$dst"
 
@@ -72,6 +74,7 @@ function pushPublic()
         installVendors
         installAssets
         clearCache
+        publish
 
         cd - >/dev/null
     fi
@@ -117,6 +120,14 @@ function clearCache()
     fi
 }
 
+function publish()
+{
+    local src=$(getRealPublicDirectory)
+    local dst=$(getPublicDirectory)
+
+    ln -sfT "$src" "$dst"
+}
+
 function ghPages()
 {
     echo "Publish static pages"
@@ -144,7 +155,7 @@ function purgeCache()
 
 function getProjectName()
 {
-    echo $(basename $(getPublicDirectory))
+    echo $(basename $(dirname $(getPublicDirectory)))
 }
 
 function getSourceDirectory()
@@ -156,7 +167,14 @@ function getPublicDirectory()
 {
     local src=$(getSourceDirectory)
 
-    echo "$src" | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~~'
+    echo "$src" | sed "s~$REPOSITORIES_DIR~$PUBLIC_REPOSITORIES_DIR~" | sed 's~\.git$~/current~'
+}
+
+function getRealPublicDirectory()
+{
+    local src=$(getPublicDirectory)
+
+    echo "$src" | sed "s~/current$~/releases/$NEWREV~"
 }
 
 function getCloneUrl()
