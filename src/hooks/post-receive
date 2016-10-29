@@ -58,9 +58,10 @@ function pushPublic()
             linkConfiguration
 
             cd "$dst"
-            installVendors
-            installAssets
-            clearCache
+            if [[ -f Makefile ]]
+            then
+                make APP_ENVIRONMENT=prod
+            fi
             cd - >/dev/null
         fi
 
@@ -81,43 +82,6 @@ function linkConfiguration()
 
             ln --symbolic --force $src $link
         done
-    fi
-}
-
-function installVendors()
-{
-    if [[ -f "composer.json" ]]
-    then
-        readonly COMPOSER="$HOME/.local/bin/composer.phar"
-
-        info 'Install vendors'
-        php "$COMPOSER" install --no-interaction --no-dev
-    fi
-}
-
-function installAssets()
-{
-    if [[ -f "bower.json" ]]
-    then
-        info 'Install assets'
-        bower install
-    fi
-}
-
-function clearCache()
-{
-    local console="bin/console"
-
-    if [[ ! -f "$console" ]]
-    then
-        console="app/console"
-    fi
-
-    if [[ -f "$console" ]]
-    then
-        php "$console" cache:clear --env=prod
-        php "$console" assets:install --env=prod web --symlink --relative
-        php "$console" assetic:dump --env=prod
     fi
 }
 
