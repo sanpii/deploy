@@ -66,6 +66,7 @@ function pushPublic()
         fi
 
         publish
+        removeOldRelease
     fi
 }
 
@@ -91,6 +92,20 @@ function publish()
     local dst=$(getPublicDirectory)
 
     ln --symbolic --force --no-target-directory "$src" "$dst"
+}
+
+function removeOldRelease()
+{
+    local dir="$(getRealPublicDirectory)/.."
+    local releases=$(ls -1 --reverse -t "$dir")
+
+    if [[ $(echo $releases | wc -l) -gt 5 ]]
+    then
+        local last_release=$(echo "$releases" | head -1)
+
+        info "Remove oldest repository"
+        rm --recursive "$last_release"
+    fi
 }
 
 function ghPages()
