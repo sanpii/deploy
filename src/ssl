@@ -100,7 +100,7 @@ main()
     then
         local sites=$@
     else
-        local sites=$(find /etc/nginx/sites-enabled -type l)
+        local sites=$(find /etc/nginx/sites-enabled)
     fi
 
     if [ ! -e "$LETSENCRYPT_WEBROOT" ]
