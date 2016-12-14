@@ -30,7 +30,7 @@ function main()
     mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
     sudo -u $PGSQL_USER pg_dumpall -f /media/data/pgsql.dump
 
-    borg create -C zlib,6 "$REPOSITORY::cuddles-$(date +%Y-%m-%d_%H:%M:%S)" $BACKUP_FILES
+    borg create --compression zlib,6 --exclude-from "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" "$REPOSITORY::cuddles-$(date +%Y-%m-%d_%H:%M:%S)" $BACKUP_FILES
 
     borg prune --verbose --stats --list \
         --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 \
