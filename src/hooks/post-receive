@@ -49,12 +49,12 @@ function pushPublic()
             local src=$(getSourceDirectory)
             local cloneUrl=$(getCloneUrl)
 
-            if [[ ! -d "$(basename $dst)" ]]
+            if [[ ! -d "$dst" ]]
             then
-                mkdir --parents "$(basename $dst)"
+                mkdir --parents "$dst"
             fi
 
-            git clone --quiet "$src" "$dst"
+            git archive --remote "$src" master | tar --extract --touch --directory="$dst"
             linkConfiguration
 
             cd "$dst"
