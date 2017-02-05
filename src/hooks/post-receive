@@ -57,12 +57,10 @@ function pushPublic()
             git archive --remote "$src" master | tar --extract --touch --directory="$dst"
             linkConfiguration
 
-            cd "$dst"
             if [[ -f Makefile ]]
             then
-                make APP_ENVIRONMENT=prod
+                make --directory="$dst" APP_ENVIRONMENT=prod
             fi
-            cd - >/dev/null
         fi
 
         publish
