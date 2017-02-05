@@ -9,15 +9,9 @@ source "$BASE_DIR/config/current.sh"
 function createRepo()
 {
     local name=$1
-    local visibility=$2
     local repo="$REPOSITORIES_DIR/$name.git"
 
     git init -q --bare "$repo"
-    cd "$repo"
-    if [[ $visibility = "public" ]]
-    then
-        git config custom.public true
-    fi
 
     echo "$repo"
 }
@@ -75,7 +69,7 @@ function main()
 {
     local name="$1"
     local visibility="${2-private}"
-    local repo=$(createRepo "$name" "$visibility")
+    local repo=$(createRepo "$name")
 
     if [[ $visibility = "public" ]]
     then
