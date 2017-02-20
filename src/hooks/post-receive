@@ -64,7 +64,7 @@ function pushPublic()
         fi
 
         publish
-        removeOldRelease
+        removeOldRelease "$(getRealPublicDirectory)/.."
     fi
 }
 
@@ -95,7 +95,7 @@ function publish()
 
 function removeOldRelease()
 {
-    local dir="$(getRealPublicDirectory)/.."
+    local dir="$1"
     local releases=$(ls -1 --reverse -t "$dir")
 
     if [[ $(echo $releases | wc -l) -gt 5 ]]
