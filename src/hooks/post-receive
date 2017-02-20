@@ -57,7 +57,7 @@ function pushPublic()
             git archive --remote "$src" master | tar --extract --touch --directory="$dst"
             linkConfiguration
 
-            if [[ -f Makefile ]]
+            if [[ -f "$dst/Makefile" ]]
             then
                 make --directory="$dst" APP_ENVIRONMENT=prod
             fi
