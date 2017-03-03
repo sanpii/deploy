@@ -17,7 +17,7 @@ function postgresql_test()
     readonly CLUSTER_DIR="/var/lib/postgresql/$PGSQL_VERSION/backup/"
 
     sudo -u postgres pg_createcluster $PGSQL_VERSION backup --start -d "$CLUSTER_DIR"
-    sudo -u postgres psql --port 5433 --quiet --command '\i /media/data/pgsql.dump'
+    sudo -u postgres psql --port 5433 --output /dev/null --quiet --command '\i /media/data/pgsql.dump'
 
 
     sudo -u postgres pg_dropcluster --stop "$PGSQL_VERSION" backup
