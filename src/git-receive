@@ -6,7 +6,7 @@ source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
 
 function main()
 {
-    local command=$(echo $SSH_ORIGINAL_COMMAND | grep -Po 'git-[^\s]*')
+    local command=$(echo $SSH_ORIGINAL_COMMAND | grep -Po '^git-[^\s]*')
 
     if [ "$command" = "git-create-repo" ]
     then
