@@ -55,7 +55,9 @@ function main()
         readonly RSYNC_PID=$!
     fi
 
+    set +e
     postgresql_test
+    set -e
 
     wait $RSYNC_PID
 
