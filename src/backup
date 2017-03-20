@@ -31,7 +31,8 @@ function postgresql_test()
         sudo -u postgres pg_prove --dbname "$database" --port 5433 $TEST_DIR/$database/*.sql
     done
 
-    sudo -u postgres pg_dropcluster --stop "$PGSQL_VERSION" backup
+    sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
+    sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
 
     exit
 }
