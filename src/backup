@@ -17,8 +17,6 @@ function postgresql_test()
     readonly CLUSTER_DIR="/var/lib/postgresql/$PGSQL_VERSION/backup"
     readonly TEST_DIR="$CLUSTER_DIR/tests"
 
-    sudo -su postgres
-
     sudo -u postgres pg_createcluster "$PGSQL_VERSION" backup -d "$CLUSTER_DIR"
     sudo -u postgres pg_conftool "$PGSQL_VERSION" backup set shared_preload_libraries 'pg_stat_statements,powa,pg_stat_kcache,pg_qualstats'
     sudo -u postgres pg_ctlcluster "$PGSQL_VERSION" backup start
@@ -27,17 +25,13 @@ function postgresql_test()
     do
         if [[ "$database" != "powa" ]]
         then
-            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command '\i /media/data/pgsql_dump/$database.dump'
-            sudo -u postgres mkdir --parent "$TEST_DIR/$database"
-            sudo -u postgres pg_tapgen --dbname "$database" --directory "$TEST_DIR/$database"
-            sudo -u postgres pg_prove --dbname "$database" --port 5433 $TEST_DIR/$database/*.sql
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump"
         fi
     done
 
     sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
     sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
-
-    exit
 }
 
 function postgersql_backup()
