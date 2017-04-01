@@ -20,6 +20,7 @@ function postgresql_test()
     sudo -u postgres pg_createcluster "$PGSQL_VERSION" backup -d "$CLUSTER_DIR"
     sudo -u postgres pg_conftool "$PGSQL_VERSION" backup set shared_preload_libraries 'pg_stat_statements,powa,pg_stat_kcache,pg_qualstats'
     sudo -u postgres pg_ctlcluster "$PGSQL_VERSION" backup start
+    sudo -u postgres psql --port 5433 --command "CREATE ROLE $PGSQL_USER WITH SUPERUSER PASSWORD '$PGSQL_PASSWORD'"
 
     for database in $(postgresql_get_databases)
     do
