@@ -27,7 +27,7 @@ function postgresql_test()
         if [[ "$database" != "powa" ]]
         then
             sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
-            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump"
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump" "$database"
         fi
     done
 
