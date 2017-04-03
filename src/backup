@@ -24,7 +24,7 @@ function postgresql_test()
 
     for database in $(postgresql_get_databases)
     do
-        if [[ "$database" != "powa" ]]
+        if [[ "$database" != "powa" && "$database" != "postgres" ]]
         then
             sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
             sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump" "$database"
