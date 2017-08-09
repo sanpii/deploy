@@ -11,7 +11,7 @@ function main()
 {
     mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
 
-    mysqldump -u $MYSQL_USER --password="$MYSQL_PASSWORD" --all-databases > /media/data/mysql.dump
+    mysql_backup
     postgersql_backup
 
     borg create --compression zlib,6 --exclude-from "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" "$REPOSITORY::cuddles-$(date +%Y-%m-%d_%H:%M:%S)" $BACKUP_FILES
@@ -37,13 +37,24 @@ function main()
     umount $MOUNT_POINT
 }
 
+function mysql_backup()
+{
+    ensure_directory '/media/data/mysql_dump' 'mysql'
+
+    for database in $(mysql_get_databases)
+    do
+        mysqldump --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" "$database" > "/media/data/mysql_dump/$database.dump"
+    done
+}
+
+function mysql_get_databases()
+{
+    echo 'SHOW DATABASES;' | mysql --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" --silent
+}
+
 function postgersql_backup()
 {
-    if [[ ! -d "/media/data/pgsql_dump/" ]]
-    then
-        sudo mkdir --parent "/media/data/pgsql_dump/"
-        sudo chown postgres:postgres "/media/data/pgsql_dump/"
-    fi
+    ensure_directory '/media/data/pgsql_dump' 'postgres'
 
     for database in $(postgresql_get_databases)
     do
@@ -77,6 +88,19 @@ function postgresql_test()
 
     sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
     sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
+}
+
+function ensure_directory()
+{
+    local name=$1
+    local user=$2
+    local group=${3-$user}
+
+    if [[ ! -d "$name" ]]
+    then
+        mkdir --parent "$name"
+        chown "$user:$group" "$name"
+    fi
 }
 
 if [[ ! -f "$LOCK" ]]
