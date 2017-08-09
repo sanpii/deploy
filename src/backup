@@ -7,48 +7,6 @@ source "$(dirname $(realpath $BASH_SOURCE))/config/backup.sh"
 readonly LOCK="/var/lock/backup"
 readonly MOUNT_POINT=$(dirname $REPOSITORY)
 
-function postgresql_get_databases()
-{
-    sudo -u postgres psql --pset tuples_only --command 'SELECT datname FROM pg_database WHERE datistemplate = false;'
-}
-
-function postgresql_test()
-{
-    readonly CLUSTER_DIR="/var/lib/postgresql/$PGSQL_VERSION/backup"
-    readonly TEST_DIR="$CLUSTER_DIR/tests"
-
-    sudo -u postgres pg_createcluster "$PGSQL_VERSION" backup -d "$CLUSTER_DIR"
-    sudo -u postgres pg_conftool "$PGSQL_VERSION" backup set shared_preload_libraries 'pg_stat_statements,powa,pg_stat_kcache,pg_qualstats'
-    sudo -u postgres pg_ctlcluster "$PGSQL_VERSION" backup start
-    sudo -u postgres psql --port 5433 --command "CREATE ROLE $PGSQL_USER WITH SUPERUSER PASSWORD '$PGSQL_PASSWORD'"
-
-    for database in $(postgresql_get_databases)
-    do
-        if [[ "$database" != "powa" && "$database" != "postgres" ]]
-        then
-            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
-            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump" "$database"
-        fi
-    done
-
-    sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
-    sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
-}
-
-function postgersql_backup()
-{
-    if [[ ! -d "/media/data/pgsql_dump/" ]]
-    then
-        sudo mkdir --parent "/media/data/pgsql_dump/"
-        sudo chown postgres:postgres "/media/data/pgsql_dump/"
-    fi
-
-    for database in $(postgresql_get_databases)
-    do
-        sudo -u postgres pg_dump --file "/media/data/pgsql_dump/$database.dump" "$database"
-    done
-}
-
 function main()
 {
     mount | grep -q $MOUNT_POINT || mount $MOUNT_POINT
@@ -77,6 +35,48 @@ function main()
     echo "remote backup ok"
 
     umount $MOUNT_POINT
+}
+
+function postgersql_backup()
+{
+    if [[ ! -d "/media/data/pgsql_dump/" ]]
+    then
+        sudo mkdir --parent "/media/data/pgsql_dump/"
+        sudo chown postgres:postgres "/media/data/pgsql_dump/"
+    fi
+
+    for database in $(postgresql_get_databases)
+    do
+        sudo -u postgres pg_dump --file "/media/data/pgsql_dump/$database.dump" "$database"
+    done
+}
+
+function postgresql_get_databases()
+{
+    sudo -u postgres psql --pset tuples_only --command 'SELECT datname FROM pg_database WHERE datistemplate = false;'
+}
+
+function postgresql_test()
+{
+    readonly CLUSTER_DIR="/var/lib/postgresql/$PGSQL_VERSION/backup"
+    readonly TEST_DIR="$CLUSTER_DIR/tests"
+
+    sudo -u postgres pg_createcluster "$PGSQL_VERSION" backup -d "$CLUSTER_DIR"
+    sudo -u postgres pg_conftool "$PGSQL_VERSION" backup set shared_preload_libraries 'pg_stat_statements,powa,pg_stat_kcache,pg_qualstats'
+    sudo -u postgres pg_ctlcluster "$PGSQL_VERSION" backup start
+    sudo -u postgres psql --port 5433 --command "CREATE ROLE $PGSQL_USER WITH SUPERUSER PASSWORD '$PGSQL_PASSWORD'"
+
+    for database in $(postgresql_get_databases)
+    do
+        if [[ "$database" != "powa" && "$database" != "postgres" ]]
+        then
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump" "$database"
+        fi
+    done
+
+    sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
+    sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
 }
 
 if [[ ! -f "$LOCK" ]]
