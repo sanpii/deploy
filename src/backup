@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 source "$(dirname $(realpath $BASH_SOURCE))/config/backup.sh"
 
 readonly LOCK="/var/lock/backup"
@@ -26,10 +24,8 @@ function main()
         readonly RSYNC_PID=$!
     fi
 
-    set +e
     postgresql_test
     echo "postgresql backup ok"
-    set -e
 
     wait $RSYNC_PID
     echo "remote backup ok"
