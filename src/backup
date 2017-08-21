@@ -39,7 +39,10 @@ function mysql_backup()
 
     for database in $(mysql_get_databases)
     do
-        mysqldump --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" "$database" > "/media/data/mysql_dump/$database.dump"
+        if [[ "$database" != "information_schema" && "$database" != "performance_schema" ]]
+        then
+            mysqldump --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" "$database" > "/media/data/mysql_dump/$database.dump"
+        fi
     done
 }
 
