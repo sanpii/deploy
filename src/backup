@@ -85,7 +85,7 @@ function postgresql_test()
         fi
     done
 
-    sudo -u postgres pg_ctlcluster --mode fast "$PGSQL_VERSION" backup stop
+    sudo -u postgres pg_ctlcluster --mode immediate "$PGSQL_VERSION" backup stop
     sudo -u postgres pg_dropcluster "$PGSQL_VERSION" backup
 }
 
