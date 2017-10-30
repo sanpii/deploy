@@ -153,7 +153,7 @@ main()
 
     if [ $dry_run = false ]
     then
-        service nginx reload
+        systemctl reload nginx
     fi
 }
 
