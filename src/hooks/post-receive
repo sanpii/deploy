@@ -29,7 +29,7 @@ function pushMirrors()
         for remote in $(git remote)
         do
             info "Push to $remote"
-            git push --force --quiet --all "$remote" > /dev/null
+            git push --prune "$remote" '+refs/heads/*' '+refs/tags/*:refs/tags/*'
         done
     fi
 }
