@@ -126,7 +126,7 @@ main()
             then
                 if [ $dry_run = false ]
                 then
-                    letsencrypt certonly $vhosts_arg \
+                    certbot certonly $vhosts_arg \
                         --email "$email" -c /etc/letsencrypt/config.cli.ini \
                         --renew-by-default \
                         --server https://acme-v01.api.letsencrypt.org/directory
