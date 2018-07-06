@@ -14,9 +14,7 @@ function main()
 
     borg create --compression zlib,6 --exclude-from "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" "$REPOSITORY::cuddles-$(date +%Y-%m-%d_%H:%M:%S)" $BACKUP_FILES
 
-    borg prune --verbose --stats --list \
-        --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 \
-        "$REPOSITORY"
+    borg prune --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 "$REPOSITORY"
 
     if [[ $(date +%H) -eq 3 ]]
     then
