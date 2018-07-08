@@ -23,10 +23,8 @@ function main()
     fi
 
     postgresql_test
-    echo "postgresql backup ok"
 
     wait $RSYNC_PID
-    echo "remote backup ok"
 
     umount $MOUNT_POINT
 }
