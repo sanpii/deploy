@@ -90,7 +90,7 @@ function publish()
     local dst=$(getPublicDirectory)
 
     ln --symbolic --force --no-target-directory "$src" "$dst"
-    sudo service php7.2-fpm restart
+    sudo service php7.3-fpm restart
 }
 
 function removeOldRelease()
