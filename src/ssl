@@ -128,8 +128,7 @@ main()
                 then
                     certbot certonly $vhosts_arg \
                         --email "$email" -c /etc/letsencrypt/config.cli.ini \
-                        --renew-by-default \
-                        --server https://acme-v01.api.letsencrypt.org/directory
+                        --renew-by-default
 
                     if [ $? -eq 0 ]
                     then
