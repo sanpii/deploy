@@ -41,13 +41,9 @@ function createGitlabMirror()
     local visibility_level=0
 
     cd "$repo"
-    if [[ "$visibility" = "public" ]]
-    then
-        visibility_level=20
-    fi
 
     echo -n "Create $visibility gitlab mirror: "
-    curl -s --header "PRIVATE-TOKEN: $GITLAB_TOKEN" -d "name=$name" -d "visibility_level=$visibility_level" https://gitlab.com/api/v3/projects > /dev/null
+    curl -s --header "PRIVATE-TOKEN: $GITLAB_TOKEN" -d "name=$name" -d "visibility=$visibility" https://gitlab.com/api/v4/projects > /dev/null
     if [[ $? -eq 0 ]]
     then
         git remote add gitlab "git@gitlab.com:$GITLAB_USER/$name.git"
