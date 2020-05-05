@@ -20,15 +20,7 @@ function main()
 
     borg prune --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 "$REPOSITORY"
 
-    if [[ $(date +%H) -eq 3 ]]
-    then
-        rsync --recursive --delete --compress $REPOSITORY kimsufi:~ &
-        readonly RSYNC_PID=$!
-    fi
-
     postgresql_test
-
-    wait $RSYNC_PID
 
     umount $MOUNT_POINT
 }
