@@ -1,14 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 set -euo pipefail
 
-readonly ZONEDIR='/var/cache/bind'
+readonly KEYFILE='/etc/bind/dnssec'
 
-main()
+dns_sign()
 {
-
     local zone=$1
-    local zonefile="$ZONEDIR/$zone.zone"
+    local zonefile="$(zone_file $zone)"
 
     named-checkzone $zone $zonefile.signed
 
@@ -29,6 +28,60 @@ main()
     dnssec-signzone -A -3 $(head -c 1000 /dev/random | sha1sum | cut -b 1-16) -N increment -o $zone -t $zonefile
     service bind9 reload
     named-checkzone $zone $zonefile.signed
+}
+
+dns_keys()
+{
+    local zone=$1
+    local zonefile="$(zone_file $zone)"
+
+    local ksk=$(dnssec-keygen -f KSK -3 -a ECDSAP256SHA256 -r /dev/random "$zone" | tail -1)
+    local zsk=$(dnssec-keygen -3 -a ECDSAP256SHA256 -r /dev/random "$zone" | tail -1)
+
+    local content="$(cat $zonefile | head -n -2)
+\$INCLUDE $KEYFILE/$ksk.key
+\$INCLUDE $KEYFILE/$zsk.key"
+
+    echo "$content" > $zonefile
+
+    dns_sign $zone
+}
+
+zone_file()
+{
+    local zone=$1
+    readonly ZONEDIR='/var/cache/bind'
+
+    echo "$ZONEDIR/$zone.zone"
+}
+
+usage()
+{
+    >&2 echo "$0 <command> <zone name>
+
+Available commands:
+
+  keys        Generates key files
+  sign        Signes zone"
+
+    exit 1
+}
+
+function_exists()
+{
+    local function=$1
+
+    type $function >/dev/null 2>&1
+}
+
+main()
+{
+    local command=$1
+    local zone=$2
+
+    cd $KEYFILE
+    function_exists "dns_${command}" || usage
+    eval dns_${command} $zone
 }
 
 main $*
