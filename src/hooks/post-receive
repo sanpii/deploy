@@ -59,7 +59,7 @@ function pushPublic()
 
             if [[ -f "$dst/Makefile" ]]
             then
-                make --directory="$dst" APP_ENVIRONMENT=prod
+                make --directory="$dst" --jobs=$(nproc) APP_ENVIRONMENT=prod
             fi
         fi
 
