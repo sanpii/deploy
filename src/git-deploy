@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly BASE_DIR="$(dirname $(realpath $BASH_SOURCE))"
+
+source "$BASE_DIR/config/current.sh"
+
+function main()
+{
+    local name="$1"
+    cd "$REPOSITORIES_DIR/$name.git"
+
+    local rev="$(git rev-parse ${2-HEAD})"
+
+    echo "- $rev master" | hooks/post-receive
+}
+
+if [[ $# -lt 1 ]]
+then
+    echo "$0 name [revision]"
+    exit 1
+fi
+
+main "$@"

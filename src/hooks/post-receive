@@ -56,11 +56,11 @@ function pushPublic()
 
             git archive --remote "$src" master | tar --extract --touch --directory="$dst"
             linkConfiguration
+        fi
 
-            if [[ -f "$dst/Makefile" ]]
-            then
-                make --directory="$dst" --jobs=$(nproc) APP_ENVIRONMENT=prod
-            fi
+        if [[ -f "$dst/Makefile" ]]
+        then
+            make --directory="$dst" --jobs=$(nproc) APP_ENVIRONMENT=prod
         fi
 
         publish
