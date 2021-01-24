@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail
+
+mount /media/backup/
+borg list /media/backup/borg/ | grep --quiet "cuddles-$(date +'%Y-%m-%d')"
+umount /media/backup/
