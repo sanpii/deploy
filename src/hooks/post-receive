@@ -97,9 +97,8 @@ function removeOldRelease()
 {
     local dir="$1"
     local old_releases=$(ls -1 -t "$dir" | tail +6)
-    let count=$(echo $old_releases | wc -l)
 
-    info "Remove $count oldest repositories"
+    info "Remove oldest repository"
 
     for release in $old_releases
     do
