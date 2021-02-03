@@ -11,9 +11,10 @@ function main()
     local name="$1"
     cd "$REPOSITORIES_DIR/$name.git"
 
-    local rev="$(git rev-parse ${2-HEAD})"
+    local newrev="$(git rev-parse ${2-HEAD})"
+    local oldrev="$(git rev-parse $newrev~)"
 
-    echo "- $rev master" | hooks/post-receive
+    echo "$oldrev $newrev master" | hooks/post-receive
 }
 
 if [[ $# -lt 1 ]]
