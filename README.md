@@ -19,7 +19,6 @@ This hook makes many thinks:
     * execute `composer install` ;
     * execute symfony command ;
     * execute `bower install` ;
-    * clean the nginx reverse proxy[^1] ;
 * public `gh-pages` branch to `$WEROOT_DIR`.
 
 ## src/create_depo
@@ -40,6 +39,3 @@ In your `~/.ssh/authorized_keys`:
 ```
 command="deploy/src/receive" ssh-rsa …
 ```
-
-[^1]: The `proxy_cache_purge` is only available as part of commercial
-  subscription.

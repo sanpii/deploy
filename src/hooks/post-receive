@@ -61,8 +61,11 @@ function pushPublic()
 
         if [[ -f "$dst/Makefile" ]]
         then
-            make --directory="$dst" --jobs=$(nproc) APP_ENVIRONMENT=prod
+            make --directory="$dst" --jobs=$(nproc) \
+                APP_ENVIRONMENT=prod
+                #CARGO_FLAGS="--target-dir $dst/../target --out-dir $dst/target"
         fi
+        migrateDatabase
 
         publish
         removeOldRelease "$(getRealPublicDirectory)/.."
@@ -85,6 +88,24 @@ function linkConfiguration()
             ln --symbolic --force $src $link
         done
     fi
+}
+
+function migrateDatabase()
+{
+    local database='';
+    local migration="migration_$database";
+
+    # https://dba.stackexchange.com/questions/183982/make-postgres-database-temporarily-read-only-for-performing-volume-snapshots
+    # begin;
+    # // @TODO stop modif
+    # pg_dump $database > $database.sql
+    # create database $migration
+    # psql -f $database.sql $migration
+    # // @TODO excute migration
+    # drop database $database;
+    # alter database $migration rename to $database;
+    # // @TODO allow modif
+    # commit;
 }
 
 function publish()
@@ -124,14 +145,6 @@ function ghPages()
         git fetch --quiet origin
         git reset --quiet --hard origin/gh-pages
     fi
-}
-
-function purgeCache()
-{
-    local url=$1
-
-    info 'Purge cache'
-    ssh reverse-proxy 'for f in $(find /var/cache/nginx/ -type f -exec grep -la "^KEY: $url" {} \;); do rm $f; done'
 }
 
 function getProjectName()
