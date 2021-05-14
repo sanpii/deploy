@@ -84,6 +84,12 @@ function linkConfiguration()
         for src in $(find "$config" -type f)
         do
             local link=$(echo $src | sed "s~$config~$dst~")
+            local dir=$(basename $link)
+
+            if [[ ! -d "$dir" ]]
+            then
+                mkdir --parent "$dir"
+            fi
 
             ln --symbolic --force $src $link
         done
