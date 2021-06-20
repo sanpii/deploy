@@ -11,7 +11,7 @@ function main()
     set -e
     unset GIT_DIR
 
-    if [[ "$(getBranch)" == "master" ]]
+    if $(shouldPublish)
     then
         pushPublic
     fi
@@ -20,6 +20,13 @@ function main()
     then
         ghPages
     fi
+}
+
+function shouldPublish()
+{
+    local branch=$(getBranch)
+
+    [[ "$branch" == "master" ]] || [[ "$branch" == "main" ]]
 }
 
 function pushMirrors()
@@ -55,7 +62,7 @@ function pushPublic()
                 mkdir --parents "$dst"
             fi
 
-            git archive --remote "$src" master | tar --extract --touch --directory="$dst"
+            git archive --remote "$src" "$(getBranch)" | tar --extract --touch --directory="$dst"
             linkConfiguration
         fi
 

@@ -14,7 +14,7 @@ function main()
     local newrev="$(git rev-parse ${2-HEAD})"
     local oldrev="$(git rev-parse $newrev~)"
 
-    echo "$oldrev $newrev master" | hooks/post-receive
+    echo "$oldrev $newrev main" | hooks/post-receive
 }
 
 if [[ $# -lt 1 ]]
