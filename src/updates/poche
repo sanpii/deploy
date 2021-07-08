@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+version=${1-$(wget -O - -q https://api.github.com/repos/wallabag/wallabag/releases/latest | jq --raw-output .tag_name)}
+
+git fetch
+git checkout $version
+php7.4 /usr/local/bin/composer install --no-scripts -a
+rm -r var/cache/prod
+php7.4 ./bin/console doctrine:migration:migrate
+php7.4 ./bin/console cache:warmup

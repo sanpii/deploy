@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -euo pipefail
+
+remove_oldest()
+{
+    ls -1tp *.sql | tail -n +6 | xargs -I {} rm -- {}
+    ls -1tpd v* | tail -n +6 | xargs -I {} rm -r -- {}
+}
+
+version=${1-$(wget -O - -q https://api.github.com/repos/Chocobozzz/PeerTube/releases/latest | jq --raw-output .tag_name)}
+
+echo "Update to $version"
+
+pg_dump peertube > peertube-pre-$version.sql
+wget --continue https://github.com/Chocobozzz/PeerTube/releases/download/$version/peertube-$version.zip
+unzip peertube-$version.zip
+rm peertube-$version.zip
+mv peertube-$version $version
+cd $version
+yarn install --production --pure-lockfile
+cd ..
+ln --no-target-directory --force --symbolic $version current
+sudo systemctl restart peertube
+sudo systemctl reload nginx
+
+remove_oldest
+diff -u current/config/production.yaml.example config/production.yaml
+diff -u current/support/nginx/peertube /etc/nginx/sites-enabled/tube.homecomputing.fr
+diff -u current/support/systemd/peertube.service /etc/systemd/system/peertube.service

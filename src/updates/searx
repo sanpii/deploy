@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+main()
+{
+    local version=${1-$(wget -O - -q https://api.github.com/repos/searx/searx/releases/latest | jq --raw-output .tag_name)}
+
+    sudo systemctl stop uwsgi
+
+    git fetch
+    git stash
+    git checkout $version
+    git stash pop
+
+    . searx-ve/bin/activate
+    pip install --upgrade --requirement requirements.txt
+
+    sudo systemctl start uwsgi
+}
+
+main $@
