@@ -14,11 +14,10 @@ And edit `current.sh` with our configuration.
 
 This hook makes many thinks:
 
-* push to mirrors ;
-* publish public repositories to `$PUBLIC_REPOSITORIES_DIR` and :
-    * execute `composer install` ;
-    * execute symfony command ;
-    * execute `bower install` ;
+* push to mirrors;
+* publish public repositories to `$PUBLIC_REPOSITORIES_DIR` and:
+    * link configuration from /etc/app;
+    * execute `make` if a Makefile exists;
 * public `gh-pages` branch to `$WEROOT_DIR`.
 
 ## src/create_depo
