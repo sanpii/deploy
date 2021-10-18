@@ -8,11 +8,11 @@ git fetch
 git stash
 git checkout $version
 git stash pop
-composer update --no-dev -a --no-scripts
+php7.4 ~/.local/bin/composer update --no-dev -a --no-scripts
 bin/install-jsdeps.sh
 cd skins/elastic
 lessc -x styles/styles.less > styles/styles.css
 lessc -x styles/print.less > styles/print.css
 lessc -x styles/embed.less > styles/embed.css
 cd -
-./bin/update.sh -v $version
+php7.4 ./bin/update.sh -v $version
