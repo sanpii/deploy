@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+version=${1-$(wget -O - -q https://api.github.com/repos/janeczku/calibre-web/releases/latest | jq --raw-output .tag_name)}
+
+echo "Update to $version"
+
+git fetch
+git stash
+git checkout "$version"
+git stash pop
+. env/bin/activate
+pip install -U -r requirements.txt
+sudo systemctl restart calibre-web
