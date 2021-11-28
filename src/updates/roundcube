@@ -8,7 +8,7 @@ git fetch
 git stash
 git checkout $version
 git stash pop
-php ~/.local/bin/composer update --no-dev -a --no-scripts
+php ~/.local/bin/composer update --no-dev -a --no-scripts --ignore-platform-reqs
 bin/install-jsdeps.sh
 bin/jsshrink.sh
 bin/updatecss.sh
