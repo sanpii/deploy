@@ -32,7 +32,7 @@ php occ db:add-missing-primary-keys
 php occ maintenance:mimetype:update-db
 php occ maintenance:mimetype:update-js
 
-diff -u /etc/app/nextcloud/config/config.php current/config/config.php
+diff -u /etc/app/nextcloud/config/config.php config/config.php
 
 rm config/config.php
 ln --symbolic /etc/app/nextcloud/config/config.php config/config.php
