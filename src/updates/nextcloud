@@ -42,3 +42,4 @@ cd ..
 ln --no-target-directory --force --symbolic "v$version" current
 
 remove_oldest
+sudo systemctl reload nginx
