@@ -9,6 +9,7 @@ remove_oldest()
 }
 
 version=$1
+php=php8.0
 
 echo "Update to $version"
 
@@ -25,12 +26,12 @@ patch --strip=1 --forward < ../patch || true
 ln --symbolic --force /media/data/share data
 \cp /etc/app/nextcloud/config/config.php config/config.php
 
-php occ upgrade
-php occ db:add-missing-indices
-php occ db:add-missing-columns
-php occ db:add-missing-primary-keys
-php occ maintenance:mimetype:update-db
-php occ maintenance:mimetype:update-js
+$php occ upgrade
+$php occ db:add-missing-indices
+$php occ db:add-missing-columns
+$php occ db:add-missing-primary-keys
+$php occ maintenance:mimetype:update-db
+$php occ maintenance:mimetype:update-js
 
 diff -u /etc/app/nextcloud/config/config.php config/config.php
 
@@ -42,4 +43,5 @@ cd ..
 ln --no-target-directory --force --symbolic "v$version" current
 
 remove_oldest
+sudo systemctl restart $php-fpm
 sudo systemctl reload nginx
