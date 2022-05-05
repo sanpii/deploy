@@ -25,6 +25,7 @@ cd "v$version"
 patch --strip=1 --forward < ../patch || true
 ln --symbolic --force /media/data/share data
 \cp /etc/app/nextcloud/config/config.php config/config.php
+sed -i 's/.*config_is_read_only.*//' config/config.php
 
 $php occ upgrade
 $php occ db:add-missing-indices
