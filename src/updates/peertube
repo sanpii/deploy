@@ -25,6 +25,6 @@ sudo systemctl restart peertube
 sudo systemctl reload nginx
 
 remove_oldest
-diff -u current/config/production.yaml.example config/production.yaml
-diff -u current/support/nginx/peertube /etc/nginx/sites-enabled/tube.homecomputing.fr
-diff -u current/support/systemd/peertube.service /etc/systemd/system/peertube.service
+diff -u current/config/production.yaml.example config/production.yaml || echo
+diff -u current/support/nginx/peertube /etc/nginx/sites-enabled/tube.homecomputing.fr ||echo
+diff -u current/support/systemd/peertube.service /etc/systemd/system/peertube.service || echo
