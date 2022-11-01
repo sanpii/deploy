@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+remove_oldest()
+{
+    ls -1tp *.sql | tail -n +6 | xargs -I {} rm -- {}
+    ls -1tpd v* | tail -n +6 | xargs -I {} rm -r -- {}
+}
+
+version=$1
+
+echo "Update to $version"
+
+pg_dump mattermost > mattermost-pre-$version.sql
+
+if [[ ! -d "v$version" ]]
+then
+    wget "https://releases.mattermost.com/$version/mattermost-team-$version-linux-amd64.tar.gz" --output-document - | tar zx
+    mv mattermost "v$version"
+fi
+
+cd "v$version"
+rm config/config.json
+ln --symbolic --force /etc/app/mattermost/config/config.json config/config.json
+cd ..
+
+ln --no-target-directory --force --symbolic "v$version" current
+
+remove_oldest
+sudo systemctl restart mattermost
