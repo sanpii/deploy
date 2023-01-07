@@ -249,6 +249,17 @@ function print()
     echo -n "${color}$message${NONE}"
 }
 
+function restart()
+{
+    local service=$1
+
+    if $(shouldPublish)
+    then
+        sudo systemctl restart $service
+        info "$service restarted"
+    fi
+}
+
 read OLDREV NEWREV REFNAME
 
 main $@
