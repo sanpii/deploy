@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-mount /media/backup/
+test -d /media/backup/borg || mount /media/backup/
 borg list /media/backup/borg/ | grep --quiet "cuddles-$(date +'%Y-%m-%d')"
 umount /media/backup/
