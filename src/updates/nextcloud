@@ -9,7 +9,7 @@ remove_oldest()
 }
 
 version=$1
-php=php8.0
+php=php8.1
 
 echo "Update to $version"
 
