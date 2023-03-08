@@ -7,7 +7,7 @@ get_vhosts()
     local site=$1
     local vhosts
 
-    vhosts=$(grep 'server_name ' $site | tr -d ' ' | sed 's/server_name//' | sed 's/;//' | grep -v '.onion$')
+    vhosts=$(grep 'Use tls ' $site | sed 's/Use tls //' | tr -d ' ')
     vhosts=($vhosts)
 
     echo ${vhosts[*]}
@@ -100,7 +100,7 @@ main()
     then
         local sites=$@
     else
-        local sites=$(find /etc/nginx/sites-enabled)
+        local sites=$(find /etc/apache2/sites-enabled -type f)
     fi
 
     if [ ! -e "$LETSENCRYPT_WEBROOT" ]
@@ -152,7 +152,7 @@ main()
 
     if [ $dry_run = false ]
     then
-        systemctl reload nginx
+        systemctl reload apache2
     fi
 }
 

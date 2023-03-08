@@ -45,4 +45,4 @@ ln --no-target-directory --force --symbolic "v$version" current
 
 remove_oldest
 sudo systemctl restart $php-fpm
-sudo systemctl reload nginx
+sudo systemctl reload apache2

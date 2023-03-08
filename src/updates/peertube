@@ -22,9 +22,8 @@ yarn install --production --pure-lockfile
 cd ..
 ln --no-target-directory --force --symbolic $version current
 sudo systemctl restart peertube
-sudo systemctl reload nginx
+sudo systemctl reload apache2
 
 remove_oldest
 diff -u current/config/production.yaml.example config/production.yaml || echo
-diff -u current/support/nginx/peertube /etc/nginx/sites-enabled/tube.homecomputing.fr ||echo
 diff -u current/support/systemd/peertube.service /etc/systemd/system/peertube.service || echo
