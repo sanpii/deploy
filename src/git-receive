@@ -6,6 +6,12 @@ source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
 
 function main()
 {
+    if [ -z "$SSH_ORIGINAL_COMMAND" ]
+    then
+        find $REPOSITORIES_DIR -type d -name '*.git' | sed "s#$REPOSITORIES_DIR/\?##" | sed 's#\.git$##' | sort
+        exit 0
+    fi
+
     local command=$(echo $SSH_ORIGINAL_COMMAND | grep -Po '^git-[^\s]*')
 
     if [ "$command" = "git-create-repo" -o "$command" = "git-deploy" ]
