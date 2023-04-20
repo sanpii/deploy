@@ -24,7 +24,7 @@ fi
 cd "v$version"
 patch --strip=1 --forward < ../patch || true
 ln --symbolic --force /media/data/share data
-ln --symbolic ../apps2
+ln --symbolic --force ../apps2
 \cp /etc/app/nextcloud/config/config.php config/config.php
 sed -i 's/.*config_is_read_only.*//' config/config.php
 
