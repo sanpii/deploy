@@ -2,47 +2,87 @@
 
 set -euo pipefail
 
+releases=$(curl --silent https://apps.nextcloud.com/api/v1/apps.json)
+
+main()
+{
+    version=$1
+    php=php8.3
+
+    echo "Update to $version"
+
+    pg_dump owncloud > nextcloud-pre-$version.sql
+
+    if [[ ! -d "v$version" ]]
+    then
+        wget "https://download.nextcloud.com/server/releases/nextcloud-$version.tar.bz2" --output-document - | tar jx
+        mv nextcloud "v$version"
+    fi
+
+    cd "v$version"
+    patch --strip=1 --forward < ../patch || true
+    ln --symbolic --force /media/data/share data
+    ln --symbolic --force ../apps2
+    \cp /etc/app/nextcloud/config/config.php config/config.php
+    sed -i 's/.*config_is_read_only.*//' config/config.php
+
+    apps
+
+    $php occ upgrade
+    $php occ db:add-missing-indices
+    $php occ db:add-missing-columns
+    $php occ db:add-missing-primary-keys
+    $php occ maintenance:mimetype:update-db
+    $php occ maintenance:mimetype:update-js
+
+    diff -u /etc/app/nextcloud/config/config.php config/config.php || echo
+
+    rm config/config.php
+    ln --symbolic /etc/app/nextcloud/config/config.php config/config.php
+    cd ..
+
+    ln --no-target-directory --force --symbolic "v$version" current
+
+    remove_oldest
+    sudo systemctl restart $php-fpm
+    sudo systemctl reload apache2
+}
+
+apps()
+{
+    local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' order by 1;";
+
+    for app in $(psql --no-psqlrc --tuples-only --command "$query" owncloud)
+    do
+        if [[ -e "apps/$app" ]] && [[ -e "apps2/$app" ]]
+        then
+            rm -r "apps2/$app"
+        elif [[ ! -e "apps/$app" ]] && [[ ! -e "apps2/$app" ]]
+        then
+            app "$app"
+        fi
+    done
+}
+
+app()
+{
+    local name=$1
+    local download=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'" && isNightly == false) | .releases | sort_by(.version) | .[].download' | tail -1)
+
+    if [[ -n "$download" ]]
+    then
+        cd apps2
+        echo "Downloading $name…"
+        wget --quiet --output-document - "$download" | tar xz || echo "Failed to download '$download'"
+        cd ..
+    fi
+}
+
 remove_oldest()
 {
     ls -1tp *.sql | tail -n +6 | xargs -I {} rm -- {}
     ls -1tpd v* | tail -n +6 | xargs -I {} rm -r -- {}
 }
 
-version=$1
-php=php8.3
-
-echo "Update to $version"
-
-pg_dump owncloud > nextcloud-pre-$version.sql
-
-if [[ ! -d "v$version" ]]
-then
-    wget "https://download.nextcloud.com/server/releases/nextcloud-$version.tar.bz2" --output-document - | tar jx
-    mv nextcloud "v$version"
-fi
-
-cd "v$version"
-patch --strip=1 --forward < ../patch || true
-ln --symbolic --force /media/data/share data
-ln --symbolic --force ../apps2
-\cp /etc/app/nextcloud/config/config.php config/config.php
-sed -i 's/.*config_is_read_only.*//' config/config.php
-
-$php occ upgrade
-$php occ db:add-missing-indices
-$php occ db:add-missing-columns
-$php occ db:add-missing-primary-keys
-$php occ maintenance:mimetype:update-db
-$php occ maintenance:mimetype:update-js
-
-diff -u /etc/app/nextcloud/config/config.php config/config.php || echo
-
-rm config/config.php
-ln --symbolic /etc/app/nextcloud/config/config.php config/config.php
-cd ..
-
-ln --no-target-directory --force --symbolic "v$version" current
-
-remove_oldest
-sudo systemctl restart $php-fpm
-sudo systemctl reload apache2
+#main $*
+apps
