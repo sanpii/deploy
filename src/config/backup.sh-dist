@@ -3,5 +3,5 @@
 readonly MYSQL_USER=root
 readonly MYSQL_PASSWORD=1234
 readonly PGSQL_VERSION=9.5
-readonly REPOSITORY=/media/backup/borg
+readonly REPOSITORY=/media/backup/rustic
 readonly BACKUP_FILES=/etc

@@ -3,5 +3,5 @@
 set -euo pipefail
 
 test -d /media/backup/borg || mount /media/backup/
-borg list /media/backup/borg/ | grep --quiet "cuddles-$(date +'%Y-%m-%d')"
+rustic snapshots --log-level=warn  | grep -q "$(date +'%Y-%m-%d')"
 umount /media/backup/

@@ -16,9 +16,8 @@ function main()
 
     postgersql_backup
 
-    borg create --compression zlib,6 --exclude-from "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" "$REPOSITORY::cuddles-$(date +%Y-%m-%d_%H:%M:%S)" $BACKUP_FILES
-
-    borg prune --keep-daily=7 --keep-weekly=4 --keep-monthly=-1 "$REPOSITORY"
+    rustic backup --quiet --repo "$REPOSITORY" --custom-ignorefile "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" $BACKUP_FILES
+    rustic forget --quiet --repo "$REPOSITORY" --keep-daily=7 --keep-weekly=4 --keep-monthly=-1
 
     postgresql_test
 
