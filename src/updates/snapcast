@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+version=${1-$(wget -O - -q https://api.github.com/repos/badaix/snapcast/releases/latest | jq --raw-output .tag_name | sed 's/^v//')}
+
+wget --continue "https://github.com/badaix/snapcast/releases/download/v$version/snapclient_$version-1_arm64_bookworm.deb"
+sudo dpkg -i "snapclient_$version-1_arm64_bookworm.deb"
+
+old_pkg=$(ls -1 -t "*.pkg" | tail +6)
+for pkg in $old_pkg
+do
+rm --force "$pkg"
+done
+
