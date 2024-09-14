@@ -22,7 +22,12 @@ main()
     cd "v$version"
     patch --strip=1 --forward < ../patch || true
     ln --symbolic --force /media/data/share data
-    ln --symbolic --force ../apps2
+
+    if [[ ! -d "apps2" ]]
+    then
+        mkdir apps2
+    fi
+
     \cp /etc/app/nextcloud/config/config.php config/config.php
     sed -i 's/.*config_is_read_only.*//' config/config.php
 
@@ -50,7 +55,8 @@ main()
 
 apps()
 {
-    local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' order by 1;";
+    # FIXME files_pdfviewer releases outdated
+    local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' and appid != 'files_pdfviewer' order by 1;";
 
     for app in $(psql --no-psqlrc --tuples-only --command "$query" owncloud)
     do
@@ -67,7 +73,7 @@ apps()
 app()
 {
     local name=$1
-    local download=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'" && isNightly == false) | .releases | sort_by(.version) | .[].download' | tail -1)
+    local download=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'") | .releases | sort_by(.version) | .[] | .download' | grep --perl-regexp --invert-match 'alpha|rc|beta' | tail -1)
 
     if [[ -n "$download" ]]
     then
@@ -84,5 +90,5 @@ remove_oldest()
     ls -1tpd v* | tail -n +6 | xargs -I {} rm -r -- {}
 }
 
-#main $*
+main $*
 apps
