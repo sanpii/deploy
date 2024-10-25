@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail
+
+cd /home/git/.local/bin
+wget https://github.com/rustic-rs/nightly/raw/main/rustic/rustic-nightly-x86_64-unknown-linux-gnu.tar.gz -O - | tar xz
+wget https://github.com/rustic-rs/nightly/raw/main/rustic_server/rustic-server-nightly-x86_64-unknown-linux-gnu.tar.gz -O - | tar xz
