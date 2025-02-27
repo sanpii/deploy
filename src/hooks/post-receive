@@ -6,6 +6,13 @@ source "$(dirname $(realpath $BASH_SOURCE))/../config/current.sh"
 
 function main()
 {
+    read OLDREV NEWREV REFNAME
+
+    deploy
+}
+
+function deploy()
+{
     set +e
     pushMirrors
     set -e
@@ -260,6 +267,7 @@ function restart()
     fi
 }
 
-read OLDREV NEWREV REFNAME
-
-main $@
+if [ "$0" = "$BASH_SOURCE" ]
+then
+    main
+fi
