@@ -27,6 +27,8 @@ function main()
     ln --symbolic --force --no-target-directory "$releases/$rev" "$public_dir/current"
 
     info "Rollbacked to $rev"
+
+    restart_services
 }
 
 if [[ $# -lt 1 ]]
