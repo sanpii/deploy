@@ -30,6 +30,7 @@ main()
 
     \cp /etc/app/nextcloud/config/config.php config/config.php
     sed -i 's/.*config_is_read_only.*//' config/config.php
+    sed -i "s/current/v$version/" config/config.php
 
     apps
 
