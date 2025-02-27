@@ -85,6 +85,10 @@ function pushPublic()
         removeOldRelease "$(getRealPublicDirectory)/.."
 
         info "Published in $(( $(date +%s) - $start )) seconds"
+
+        restart_services
+    else
+        warn 'Unpublished repository'
     fi
 }
 
@@ -254,6 +258,17 @@ function print()
     esac
 
     echo -n "${color}$message${NONE}"
+}
+
+function restart_services()
+{
+    local services=$(git config --get custom.services | tr "," "\n")
+
+    for service in $services
+    do
+        restart "$service"
+    done
+
 }
 
 function restart()
