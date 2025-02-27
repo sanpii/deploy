@@ -55,8 +55,7 @@ main()
 
 apps()
 {
-    # FIXME files_pdfviewer releases outdated
-    local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' and appid != 'files_pdfviewer' order by 1;";
+    local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' order by 1;";
 
     for app in $(psql --no-psqlrc --tuples-only --command "$query" owncloud)
     do
@@ -73,12 +72,13 @@ apps()
 app()
 {
     local name=$1
-    local download=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'") | .releases | sort_by(.version) | .[] | .download' | grep --perl-regexp --invert-match 'alpha|rc|beta' | tail -1)
+    local version=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'") | .releases | .[] | .version' | grep --perl-regexp --invert-match 'alpha|rc|beta' | sort -V | tail -1)
+    local download=$(echo "$releases" | jq --raw-output '.[] | select(.id == "'$name'") | .releases | .[] | select(.version == "'$version'") | .download')
 
     if [[ -n "$download" ]]
     then
         cd apps2
-        echo "Downloading $name…"
+        echo "Downloading $name $version…"
         wget --quiet --output-document - "$download" | tar xz || echo "Failed to download '$download'"
         cd ..
     fi
