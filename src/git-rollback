@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly BASE_DIR="$(dirname $(realpath $BASH_SOURCE))"
+
+source "$BASE_DIR/hooks/post-receive"
+
+function main()
+{
+    local name="$1"
+    cd "$REPOSITORIES_DIR/$name.git"
+
+    local public=$(git config --get custom.public)
+
+    if [[ $public == false ]]
+    then
+        warning "Unpublished repository"
+    fi
+
+    local releases="$(dirname $(realpath $(getPublicDirectory)))"
+    local public_dir="$(dirname $releases)"
+    local prev_rev=$(ls -t "$releases" | head -2 | tail -1)
+
+    local rev="$(git rev-parse ${2-$prev_rev})"
+
+    ln --symbolic --force --no-target-directory "$releases/$rev" "$public_dir/current"
+
+    info "Rollbacked to $rev"
+}
+
+if [[ $# -lt 1 ]]
+then
+    echo "$0 name [revision]"
+    exit 1
+fi
+
+main "$@"
