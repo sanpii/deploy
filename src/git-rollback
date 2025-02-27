@@ -11,7 +11,7 @@ function main()
     local name="$1"
     cd "$REPOSITORIES_DIR/$name.git"
 
-    local public=$(git config --get custom.public)
+    local public=$(git config --get deploy.public)
 
     if [[ $public == false ]]
     then

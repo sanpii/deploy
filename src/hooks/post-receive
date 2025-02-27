@@ -50,7 +50,7 @@ function pushMirrors()
 
 function pushPublic()
 {
-    local public=$(git config --get custom.public)
+    local public=$(git config --get deploy.public)
 
     if [[ $public == true ]]
     then
@@ -262,7 +262,7 @@ function print()
 
 function restart_services()
 {
-    local services=$(git config --get custom.services | tr "," "\n")
+    local services=$(git config --get deploy.services | tr "," "\n")
 
     for service in $services
     do
