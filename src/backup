@@ -48,7 +48,7 @@ function postgersql_backup()
     ensure_directory '/media/data/pgsql_dump' 'postgres'
     sudo -u postgres rm /media/data/pgsql_dump/*.dump
 
-    sudo -u postgres pg_dumpall --roles-only > '/media/data/pgsql_dump/_roles.dump'
+    sudo -u postgres pg_dumpall --roles-only --file '/media/data/pgsql_dump/_roles.dump'
     sed -i 's/^\(CREATE ROLE postgres;\)$/-- \1/' '/media/data/pgsql_dump/_roles.dump'
     for database in $(postgresql_get_databases)
     do
