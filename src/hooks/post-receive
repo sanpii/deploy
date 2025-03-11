@@ -87,8 +87,6 @@ function pushPublic()
         info "Published in $(( $(date +%s) - $start )) seconds"
 
         restart_services
-    else
-        warn 'Unpublished repository'
     fi
 }
 
