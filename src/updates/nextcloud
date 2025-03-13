@@ -20,7 +20,6 @@ main()
     fi
 
     cd "v$version"
-    patch --strip=1 --forward < ../patch || true
     ln --symbolic --force /media/data/share data
 
     if [[ ! -d "apps2" ]]
