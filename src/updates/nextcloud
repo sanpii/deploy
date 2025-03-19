@@ -15,6 +15,15 @@ main()
 
     if [[ ! -d "v$version" ]]
     then
+        set +e
+        wget --quiet --method=HEAD "https://download.nextcloud.com/server/releases/nextcloud-$version.tar.bz2"
+        if [[ $? != 0 ]]
+        then
+            echo "Sources tarball not available"
+            exit 1
+        fi
+        set -e
+
         wget "https://download.nextcloud.com/server/releases/nextcloud-$version.tar.bz2" --output-document - | tar jx
         mv nextcloud "v$version"
     fi
