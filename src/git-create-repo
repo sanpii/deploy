@@ -20,10 +20,13 @@ function createGithubMirror()
 {
     local repo=$1
     local name=${2/\//-}
+    local visibility=$3
+
+    local public=$(test $visibility = "public" && echo 'false' || echo 'true')
 
     cd "$repo"
-    echo -n 'Create github mirror: '
-    curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" https://api.github.com/user/repos -d '{"name":"'$name'"}' > /dev/null
+    echo -n "Create $visibility github mirror: "
+    curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" https://api.github.com/user/repos -d '{"name":"'$name'", "public":"'$public'", "visibility","'$visibility'"}' > /dev/null
     if [[ $? -eq 0 ]]
     then
         git remote add github "git@github.com:$GITHUB_USER/$name.git"
@@ -67,11 +70,7 @@ function main()
     local visibility="${2-private}"
     local repo=$(createRepo "$name")
 
-    if [[ $visibility = "public" ]]
-    then
-        createGithubMirror "$repo" "$name" "$visibility"
-    fi
-
+    createGithubMirror "$repo" "$name" "$visibility"
     createGitlabMirror "$repo" "$name" "$visibility"
 
     installHooks "$repo"
