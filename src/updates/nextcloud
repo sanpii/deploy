@@ -7,7 +7,7 @@ releases=$(curl --silent https://apps.nextcloud.com/api/v1/apps.json)
 main()
 {
     version=$1
-    php=php8.3
+    php=php8.4
 
     echo "Update to $version"
 
