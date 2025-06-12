@@ -100,4 +100,3 @@ remove_oldest()
 }
 
 main $*
-apps
