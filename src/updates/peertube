@@ -20,10 +20,10 @@ mv peertube-$version $version
 cd $version
 yarn install --production --pure-lockfile
 cd ..
+git merge-file -p config/production.yaml current/config/production.yaml.example $version/config/production.yaml.example | tee production.yaml.new
+git merge-file -p /etc/systemd/system/peertube.service current/support/systemd/peertube.service $version/support/systemd/peertube.service | tee peertube.service.new
 ln --no-target-directory --force --symbolic $version current
 sudo systemctl restart peertube
 sudo systemctl reload apache2
 
 remove_oldest
-diff -u current/config/production.yaml.example config/production.yaml || echo
-diff -u current/support/systemd/peertube.service /etc/systemd/system/peertube.service || echo
