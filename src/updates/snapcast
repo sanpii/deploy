@@ -1,15 +1,18 @@
 #!/bin/bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 set -euo pipefail
 
 version=${1-$(wget -O - -q https://api.github.com/repos/badaix/snapcast/releases/latest | jq --raw-output .tag_name | sed 's/^v//')}
 
+cd $SCRIPT_DIR
 wget --continue "https://github.com/badaix/snapcast/releases/download/v$version/snapclient_$version-1_arm64_bookworm.deb"
 sudo dpkg -i "snapclient_$version-1_arm64_bookworm.deb"
+sudo systemctl restart snapclient
 
-old_pkg=$(ls -1 -t "*.pkg" | tail +6)
+old_pkg=$(ls -1 -t *.deb | tail +6)
 for pkg in $old_pkg
 do
-rm --force "$pkg"
+    rm --force "$pkg"
 done
-
