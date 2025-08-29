@@ -26,14 +26,14 @@ function main()
 
 function mysql_backup()
 {
-    ensure_directory '/media/data/mysql_dump' 'mysql'
-    rm /media/data/mysql_dump/*.dump
+    ensure_directory '/mnt/data/mysql_dump' 'mysql'
+    rm /mnt/data/mysql_dump/*.dump
 
     for database in $(mysql_get_databases)
     do
         if [[ "$database" != "information_schema" && "$database" != "performance_schema" ]]
         then
-            mysqldump --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" "$database" > "/media/data/mysql_dump/$database.dump"
+            mysqldump --user "$MYSQL_USER" --password="$MYSQL_PASSWORD" "$database" > "/mnt/data/mysql_dump/$database.dump"
         fi
     done
 }
@@ -45,14 +45,14 @@ function mysql_get_databases()
 
 function postgersql_backup()
 {
-    ensure_directory '/media/data/pgsql_dump' 'postgres'
-    sudo -u postgres rm /media/data/pgsql_dump/*.dump
+    ensure_directory '/mnt/data/pgsql_dump' 'postgres'
+    sudo -u postgres rm /mnt/data/pgsql_dump/*.dump
 
-    sudo -u postgres pg_dumpall --roles-only --file '/media/data/pgsql_dump/_roles.dump'
-    sed -i 's/^\(CREATE ROLE postgres;\)$/-- \1/' '/media/data/pgsql_dump/_roles.dump'
+    sudo -u postgres pg_dumpall --roles-only --file '/mnt/data/pgsql_dump/_roles.dump'
+    sed -i 's/^\(CREATE ROLE postgres;\)$/-- \1/' '/mnt/data/pgsql_dump/_roles.dump'
     for database in $(postgresql_get_databases)
     do
-        sudo -u postgres pg_dump --file "/media/data/pgsql_dump/$database.dump" "$database"
+        sudo -u postgres pg_dump --file "/mnt/data/pgsql_dump/$database.dump" "$database"
     done
 }
 
@@ -68,14 +68,14 @@ function postgresql_test()
 
     sudo -u postgres pg_createcluster "$PGSQL_VERSION" backup -d "$CLUSTER_DIR" > /dev/null
     sudo -u postgres pg_ctlcluster "$PGSQL_VERSION" backup start
-    sudo -u postgres psql --port 5433 --output /dev/null --quiet --command '\i /media/data/pgsql_dump/_roles.dump'
+    sudo -u postgres psql --port 5433 --output /dev/null --quiet --command '\i /mnt/data/pgsql_dump/_roles.dump'
 
     for database in $(postgresql_get_databases)
     do
         if [[ "$database" != "postgres" ]]
         then
             sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "CREATE DATABASE $database;"
-            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /media/data/pgsql_dump/$database.dump" "$database"
+            sudo -u postgres psql --port 5433 --output /dev/null --quiet --command "\i /mnt/data/pgsql_dump/$database.dump" "$database"
         fi
     done
 
