@@ -17,7 +17,9 @@ function main()
     postgersql_backup
 
     rustic backup --quiet --repo "$REPOSITORY" --custom-ignorefile "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" $BACKUP_FILES
-    rustic forget --quiet --repo "$REPOSITORY" > /dev/null
+    rustic forget --quiet --repo "$REPOSITORY"
+    rustic prune --repo "$REPOSITORY" > /dev/null
+    rustic check --repo "$REPOSITORY" > /dev/null
 
     postgresql_test
 
