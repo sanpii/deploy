@@ -4,19 +4,15 @@ set -e
 
 main()
 {
-    local version=$1
-
     sudo systemctl stop uwsgi
 
     git fetch
-    git stash
-    git checkout $version
-    git stash pop
+    git rebase origin/master
 
-    . venv/bin/activate
-    pip install --upgrade --requirement requirements.txt
+    pipenv update
+    ln --no-target-directory --symbolic --force $(pipenv --venv) venv
 
     sudo systemctl start uwsgi
 }
 
-main $@
+main
