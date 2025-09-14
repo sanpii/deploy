@@ -3,5 +3,5 @@
 set -euo pipefail
 
 test -d /media/backup/borg || mount /media/backup/
-rustic snapshots --log-level=warn  | grep -q "$(date +'%Y-%m-%d')"
+rustic snapshots --log-level=warn --no-progress --json | jq --raw-output .[].snapshots[].time | grep -q "$(date +'%Y-%m-%d')"
 umount /media/backup/
