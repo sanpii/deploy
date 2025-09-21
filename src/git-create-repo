@@ -22,11 +22,11 @@ function createGithubMirror()
     local name=${2/\//-}
     local visibility=$3
 
-    local public=$(test $visibility = "public" && echo 'false' || echo 'true')
+    local private=$(test $visibility = "public" && echo 'true' || echo 'false')
 
     cd "$repo"
     echo -n "Create $visibility github mirror: "
-    curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" https://api.github.com/user/repos -d '{"name":"'$name'", "public":"'$public'", "visibility","'$visibility'"}' > /dev/null
+    curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" https://api.github.com/user/repos -d '{"name":"'$name'", "private":"'$private'", "visibility":"'$visibility'"}' > /dev/null
     if [[ $? -eq 0 ]]
     then
         git remote add github "git@github.com:$GITHUB_USER/$name.git"
