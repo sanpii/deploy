@@ -1,11 +1,13 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
 
-function main()
-{
+function main() {
+    export CARGO_TERM_COLOR=always
+    export FORCE_COLOR=true
+
     if [ -z "$SSH_ORIGINAL_COMMAND" ]
     then
         find $REPOSITORIES_DIR -type d -name '*.git' | sed "s#$REPOSITORIES_DIR/\?##" | sed 's#\.git$##' | sort
