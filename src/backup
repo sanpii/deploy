@@ -23,6 +23,8 @@ function main()
 
     postgresql_test
 
+    rsync --archive --compress --checksum --delete /media/backup/rustic kimsufi:/home/debian
+
     umount $MOUNT_POINT
 }
 
