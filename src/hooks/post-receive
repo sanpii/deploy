@@ -85,9 +85,9 @@ function pushPublic()
         removeOldRelease "$(getRealPublicDirectory)/.."
 
         info "Published in $(( $(date +%s) - $start )) seconds"
-
-        restart_services
     fi
+
+    restart_services
 }
 
 function linkConfiguration()
