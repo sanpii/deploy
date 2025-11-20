@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-releases=$(curl --silent https://apps.nextcloud.com/api/v1/apps.json)
+releases=$(curl --silent https://garm2.nextcloud.com/api/v1/apps.json)
 
 main()
 {
