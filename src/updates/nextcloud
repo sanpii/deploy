@@ -6,8 +6,9 @@ releases=$(curl --silent https://garm2.nextcloud.com/api/v1/apps.json)
 
 main()
 {
-    version=$1
-    php=php8.4
+    local version=$1
+    local php=php8.4
+    local apps=$(apps)
 
     echo "Update to $version"
 
@@ -40,7 +41,7 @@ main()
     sed -i 's/.*config_is_read_only.*//' config/config.php
     sed -i "s/current/v$version/" config/config.php
 
-    apps
+    install_apps "$apps"
 
     $php occ upgrade
     $php occ db:add-missing-indices
@@ -66,7 +67,14 @@ apps()
 {
     local query="select appid from oc_appconfig where configkey = 'enabled' and configvalue = 'yes' order by 1;";
 
-    for app in $(psql --no-psqlrc --tuples-only --command "$query" nextcloud)
+    psql --no-psqlrc --tuples-only --command "$query" nextcloud
+}
+
+install_apps()
+{
+    local apps=$*
+
+    for app in $apps
     do
         if [[ -e "apps/$app" ]] && [[ -e "apps2/$app" ]]
         then
