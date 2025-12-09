@@ -18,7 +18,7 @@ unzip peertube-$version.zip
 rm peertube-$version.zip
 mv peertube-$version $version
 cd $version
-yarn install --production --pure-lockfile
+pnpm install --frozen-lockfile --production
 cd ..
 git merge-file -p config/production.yaml current/config/production.yaml.example $version/config/production.yaml.example | tee production.yaml.new
 git merge-file -p /etc/systemd/system/peertube.service current/support/systemd/peertube.service $version/support/systemd/peertube.service | tee peertube.service.new
