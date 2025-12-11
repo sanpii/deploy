@@ -6,11 +6,16 @@ releases=$(curl --silent https://garm2.nextcloud.com/api/v1/apps.json)
 
 main()
 {
-    local version=$1
+    local version=${1-$(wget https://download.nextcloud.com/server/releases --quiet -O - | htmlq --attribute href 'td a' | grep '^nextcloud-.*\.tar\.bz2$' | sort --version-sort | tail -1 | sed 's/nextcloud-//;s/\.tar\.bz2//')}
     local php=php8.4
     local apps=$(apps)
 
-    echo "Update to $version"
+    read -p "Update to $version? [yN]" -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        return 0
+    fi
 
     pg_dump nextcloud > nextcloud-pre-$version.sql
 
