@@ -16,7 +16,7 @@ function main() {
 
     local command=$(echo $SSH_ORIGINAL_COMMAND | grep -Po '^git-[^\s]*')
 
-    if [ "$command" = "git-create-repo" -o "$command" = "git-deploy" -o "$command" = "git-rollback" ]
+    if [ "$command" = "git-create-repo" -o "$command" = "git-deploy" -o "$command" = "git-repo" ]
     then
         $SSH_ORIGINAL_COMMAND
     else
