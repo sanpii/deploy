@@ -7,6 +7,7 @@ source "$(dirname $(realpath $BASH_SOURCE))/config/current.sh"
 function main() {
     export CARGO_TERM_COLOR=always
     export FORCE_COLOR=true
+    export CLICOLOR_FORCE=true
 
     if [ -z "$SSH_ORIGINAL_COMMAND" ]
     then
