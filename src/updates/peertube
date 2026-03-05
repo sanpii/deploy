@@ -13,10 +13,15 @@ version=${1-$(wget -O - -q https://api.github.com/repos/Chocobozzz/PeerTube/rele
 echo "Update to $version"
 
 pg_dump peertube > peertube-pre-$version.sql
-wget --continue https://github.com/Chocobozzz/PeerTube/releases/download/$version/peertube-$version.zip
-unzip peertube-$version.zip
-rm peertube-$version.zip
-mv peertube-$version $version
+
+if [[ ! -d "$version" ]]
+then
+    wget --continue https://github.com/Chocobozzz/PeerTube/releases/download/$version/peertube-$version.zip
+    unzip peertube-$version.zip
+    rm peertube-$version.zip
+    mv peertube-$version $version
+fi
+
 cd $version
 pnpm install --frozen-lockfile --production
 cd ..
