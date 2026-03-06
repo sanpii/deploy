@@ -16,10 +16,14 @@ function main()
 
     postgersql_backup
 
-    rustic backup --quiet --repo "$REPOSITORY" --custom-ignorefile "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" $BACKUP_FILES
-    rustic forget --quiet --repo "$REPOSITORY"
-    rustic prune --repo "$REPOSITORY" > /dev/null
-    rustic check --repo "$REPOSITORY" > /dev/null
+    export RUSTIC_LOG_LEVEL=warn
+    export RUSTIC_REPOSITORY="$REPOSITORY"
+    export RUSTIC_NO_PROGRESS=true
+
+    rustic backup --custom-ignorefile "$(dirname $(realpath $BASH_SOURCE))/config/exclude.txt" $BACKUP_FILES
+    rustic forget
+    rustic prune
+    rustic check
 
     postgresql_test
 
