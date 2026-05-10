@@ -5,9 +5,7 @@ set -euo pipefail
 version=${1-$(wget -O - -q https://api.github.com/repos/roundcube/roundcubemail/releases/latest | jq --raw-output .tag_name)}
 
 git fetch
-git stash
 git checkout $version
-git stash pop
 php ~/.local/bin/composer update --no-dev -a --no-scripts --ignore-platform-reqs
 bin/install-jsdeps.sh
 #bin/jsshrink.sh
