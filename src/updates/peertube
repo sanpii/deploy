@@ -25,8 +25,8 @@ fi
 cd $version
 pnpm install --frozen-lockfile --production
 cd ..
-diff -u $version/config/production.yaml.example config/production.yaml || echo
-diff -u $version/support/systemd/peertube.service /etc/systemd/system/peertube.service || echo
+diff --color -u $version/config/production.yaml.example config/production.yaml || echo
+diff --color -u $version/support/systemd/peertube.service /etc/systemd/system/peertube.service || echo
 ln --no-target-directory --force --symbolic $version current
 sudo systemctl restart peertube
 sudo systemctl reload apache2
