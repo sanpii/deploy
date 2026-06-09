@@ -35,7 +35,7 @@ main()
     fi
 
     cd "v$version"
-    ln --symbolic --force /media/data/share data
+    ln --symbolic --force /mnt/data/share data
 
     if [[ ! -d "apps2" ]]
     then
