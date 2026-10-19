@@ -2,18 +2,20 @@
 
 set -euo pipefail
 
+remove_oldest()
+{
+    ls -1tpd v* | tail -n +6 | xargs -I {} rm -r -- {}
+}
+
 version=${1-$(wget -O - -q https://api.github.com/repos/roundcube/roundcubemail/releases/latest | jq --raw-output .tag_name)}
 
-git fetch
-git checkout $version
-php ~/.local/bin/composer update --no-dev -a --no-scripts --ignore-platform-reqs
-bin/install-jsdeps.sh
-#bin/jsshrink.sh
-bin/updatecss.sh
-#bin/cssshrink.sh
-cd skins/elastic
-./node_modules/.bin/lessc --clean-css="--s1 --advanced" styles/styles.less > styles/styles.css
-./node_modules/.bin/lessc --clean-css="--s1 --advanced" styles/print.less > styles/print.css
-./node_modules/.bin/lessc --clean-css="--s1 --advanced" styles/embed.less > styles/embed.css
-cd -
-php ./bin/update.sh -v $version
+echo "Update to $version"
+if [[ ! -d "v$version" ]]
+then
+    wget --continue "https://github.com/roundcube/roundcubemail/releases/download/$version/roundcubemail-$version-complete.tar.gz" -O - | tar xz
+    mv "roundcubemail-$version" "v$version"
+fi
+
+ln --symbolic --force /etc/app/roundcube/config/config.inc.php "v$version/config/config.inc.php"
+ln --no-target-directory --force --symbolic "v$version" current
+sudo systemctl reload php8.4-fpm
