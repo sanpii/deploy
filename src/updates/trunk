@@ -2,8 +2,18 @@
 
 set -euo pipefail
 
-version=$1
+main() {
+    version=$1
 
-cd /usr/local/bin
+    cd /usr/local/bin
 
-wget https://github.com/trunk-rs/trunk/releases/download/v$version/trunk-x86_64-unknown-linux-gnu.tar.gz -O - | tar xz trunk
+    try_dl $version || try_dl v$version
+}
+
+try_dl() {
+    version=$1
+
+    wget https://github.com/trunk-rs/trunk/releases/download/$version/trunk-x86_64-unknown-linux-gnu.tar.gz -O - | tar xz trunk
+}
+
+main $*
